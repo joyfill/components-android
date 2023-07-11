@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="custom_edittext_padding">16dp</dimen>
+    <dimen name="default_text_size">12dp</dimen>
+    <dimen name="textSize_text">10dp</dimen>
+</resources>
