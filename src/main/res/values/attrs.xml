@@ -16,4 +16,6 @@
         <attr name="textSize" format="dimension" />
         <attr name="fontName" format="string" />
     </declare-styleable>
+    <declare-styleable name="CustomLinearLayout">
+    </declare-styleable>
 </resources>
