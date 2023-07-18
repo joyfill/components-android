@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:id="@+id/textField_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 

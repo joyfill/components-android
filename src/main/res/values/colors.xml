@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="black_text" tools:ignore="MissingDefaultResource">#121417</color>
+    <color name="purple_200" tools:ignore="MissingDefaultResource">#FFBB86FC</color>
+    <color name="purple_500" tools:ignore="MissingDefaultResource">#FF6200EE</color>
+    <color name="purple_700" tools:ignore="MissingDefaultResource">#FF3700B3</color>
+    <color name="teal_200" tools:ignore="MissingDefaultResource">#FF03DAC5</color>
+    <color name="teal_700" tools:ignore="MissingDefaultResource">#FF018786</color>
+    <color name="black" tools:ignore="MissingDefaultResource">#FF000000</color>
+    <color name="white" tools:ignore="MissingDefaultResource">#FFFFFFFF</color>
+    <color name="gray" tools:ignore="MissingDefaultResource">#DBDBDD</color>
+    <color name="checkbox_background" tools:ignore="MissingDefaultResource">#E3E3E3</color>
 </resources>
