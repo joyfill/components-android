@@ -65,12 +65,10 @@ class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val c
         holder.checkBox.setText(list.checkBox)
 
         holder.checkBox.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-            // TODO Auto-generated method stub
+ 
             if (buttonView.isChecked) {
-                // When Checked
                 holder.checkBox.setBackgroundColor(Color.parseColor("#E3E3E3"))
             } else {
-                // When Not Checked
                 holder.checkBox.setBackgroundColor(Color.parseColor("#FFFFFF"))
             }
         })

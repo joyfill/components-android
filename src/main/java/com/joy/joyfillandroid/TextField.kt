@@ -24,7 +24,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
     }
 
     init {
-        // Read attributes from XML
 
         text = "Text Field"
         textSize = TextField.DEFAULT_TEXT_SIZE_SP
@@ -45,7 +44,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         val padding = resources.getDimensionPixelSize(R.dimen.custom_edittext_padding)
         setPadding(16, 0, 0, 10)
 
-        // Set default text color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             setTextColor(context!!.getColor(TextField.DEFAULT_TEXT_COLOR))
         }
@@ -71,7 +69,7 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         )
 
         isBold = typedArray.getBoolean(R.styleable.CustomTextView_boldText, false)
-        isItalic = typedArray.getBoolean(R.styleable.CustomTextView_italicText, false) //
+        isItalic = typedArray.getBoolean(R.styleable.CustomTextView_italicText, false) 
 
 
         applyProperties()
@@ -103,29 +101,29 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         setFontName(fontName)
     }
 
-    // Sets the border color text of the textField
+    //Use to set the border color of textField's text ...
     fun setBorderColor(color: Int) {
         borderColor = color
         updateBorder()
     }
 
-    // Sets the corner radius text of the textField
+    //Use to set the border corner radius of textField's text ... 
     fun setCornerRadius(radius: Int) {
         cornerRadius = radius
         updateBorder()
     }
-    // Sets the border with text of the textField
+    //Use to set the border width of textField's text ...
     fun setBorderWidth(width: Int) {
         borderWidth = width
         updateBorder()
     }
 
-    // Sets the bold text of the textField
+    //Use to set the bold text of the textField ...
     fun setBold(isBold: Boolean) {
         this.isBold = isBold
         updateTextStyle()
     }
-    // Sets the italice text of the textField
+    // Sets the italic text of the textField
     fun setItalic(isItalic: Boolean) {
         this.isItalic = isItalic
         updateTextStyle()
