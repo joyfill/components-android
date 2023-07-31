@@ -204,7 +204,7 @@ class MultiDropDown@JvmOverloads constructor(
         return drawable
     }
 
-
+    // background for Ediitext
     fun createEditTextBackgroundOnTextChange(): GradientDrawable {
         val drawable = GradientDrawable()
         drawable.setStroke(3, Color.parseColor("#4776EE"))
