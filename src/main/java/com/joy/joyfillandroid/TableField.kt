@@ -71,13 +71,13 @@ class TableField(context: Context): LinearLayout(context){
         viewTextView.textSize = 14f
 
         val arrowImageView = ImageView(context)
-        arrowImageView.setImageResource(R.drawable.ic_baseline_keyboard_arrow_right_24)
+        arrowImageView.setImageResource(R.drawable.ic_expand_left)
         arrowImageView.layoutParams = LinearLayout.LayoutParams(
-            dpToPx(15),
-            dpToPx(15),
+            dpToPx(13),
+            dpToPx(13),
             1f
         ).apply {
-            setMargins(0, dpToPx(4), 0, 0)
+            setMargins(dpToPx(3), dpToPx(4), 0, 0)
 
         }
 

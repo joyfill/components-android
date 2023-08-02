@@ -47,25 +47,25 @@ class Table @JvmOverloads constructor(
     private var isKeyboardShowing = false
 
     val dataArray = mutableListOf(
-        DataItem("Text 1 at 1", R.drawable.img_box_fill),
-        DataItem("Text 1 at 1", R.drawable.img_box_fill),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Lorem ipsum dolor sit amet, consectetur adipiscing. lit. Pellentesque vel rutrum nibh,", R.drawable.img_box),
-        DataItem("Lorem dolor sit amet, consectetur adipiscing.", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 1", R.drawable.img_box),
-        DataItem("Text 1 at 10", R.drawable.img_box),
-        DataItem("Text 1 at 11", R.drawable.img_box),
-        DataItem("Text 1 at 12", R.drawable.img_box),
-        DataItem("Text 1 at 121", R.drawable.img_box),
-        DataItem("Text 1 at 112", R.drawable.img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box_fill),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box_fill),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Lorem ipsum dolor sit amet, consectetur adipiscing. lit. Pellentesque vel rutrum nibh,", R.drawable.ic_img_box),
+        DataItem("Lorem dolor sit amet, consectetur adipiscing.", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 1", R.drawable.ic_img_box),
+        DataItem("Text 1 at 10", R.drawable.ic_img_box),
+        DataItem("Text 1 at 11", R.drawable.ic_img_box),
+        DataItem("Text 1 at 12", R.drawable.ic_img_box),
+        DataItem("Text 1 at 121", R.drawable.ic_img_box),
+        DataItem("Text 1 at 112", R.drawable.ic_img_box),
     )
 
 
@@ -120,16 +120,14 @@ class Table @JvmOverloads constructor(
         moreText.textSize = 14f
 
         val addImage = ImageView(context)
-        addImage.setImageResource(R.drawable.expand_down)
+        addImage.setImageResource(R.drawable.ic_expand_down)
         addImage.layoutParams = LinearLayout.LayoutParams(
-            dpToPx(18),
-            dpToPx(18),
+            dpToPx(16),
+            dpToPx(16),
             1f
         ).apply {
-            setMargins(dpToPx(6), dpToPx(2), 0, 0)
-
+            setMargins(dpToPx(1), dpToPx(4), 0, 0)
         }
-
 
         addRowLayout.setPadding(30,15,30,15)
         addRowLayout.background = buttonBackground()
@@ -150,16 +148,15 @@ class Table @JvmOverloads constructor(
         addRowText.textSize = 14f
 
         val PlusImage = ImageView(context)
-        PlusImage.setImageResource(R.drawable.add_round)
+        PlusImage.setImageResource(R.drawable.ic_add_round)
         PlusImage.layoutParams = LinearLayout.LayoutParams(
-            dpToPx(18),
-            dpToPx(18),
+            dpToPx(16),
+            dpToPx(16),
             1f
         ).apply {
-            setMargins(dpToPx(6), dpToPx(2), 0, 0)
+            setMargins(dpToPx(1), dpToPx(2), 0, 0)
 
         }
-
         moreLayout.addView(moreText)
         moreLayout.addView(addImage)
         addRowLayout.addView(addRowText)
@@ -179,8 +176,6 @@ class Table @JvmOverloads constructor(
 
         rootView.orientation = LinearLayout.VERTICAL
         rootView.setPadding(5.dp, 5.dp, 5.dp, 5.dp)
-
-
 
         val horizontalScrollView = HorizontalScrollView(context)
         horizontalScrollView.layoutParams = LinearLayout.LayoutParams(
@@ -209,6 +204,7 @@ class Table @JvmOverloads constructor(
             TableRow.LayoutParams.WRAP_CONTENT
         )
         headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
+         setTopRowBackground(headRow)
 
         val blankHeadCell = TextView(context)
         blankHeadCell.background = topLeftCellBackground()
@@ -415,19 +411,20 @@ class Table @JvmOverloads constructor(
             textView6LayoutParams.setMargins(0,10.dp, 0,0)
             textView6.setTextColor(Color.parseColor(textColor))
             textView6.text = "Text Feild"
-            textView6.textSize = 14f
+            textView6.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            textView6.textSize = 12f
             val imageView3 = ImageView(context)
             val imageView3LayoutParams = TableRow.LayoutParams(20.dp, 20.dp)
             imageView3.layoutParams = imageView3LayoutParams
             imageView3LayoutParams.setMargins(0,10.dp,0,0)
-            imageView3.setImageResource(R.drawable.ic_baseline_down)
+            imageView3.setImageResource(R.drawable.ic_expand_down)
             imageView3.setPadding(5.dp, 0, 0, 0)
             linearLayout3.addView(textView6)
             linearLayout3.addView(imageView3)
             tableRow.addView(linearLayout3)
             addRowLayout.setOnClickListener {
                 val newText = "New Text at 1"
-                val newImageResource = R.drawable.img_box
+                val newImageResource = R.drawable.ic_img_box
                 val newDataItem = DataItem(newText, newImageResource)
                 dataArray.add(newDataItem)
                 updateTableLayout(tableLayout, dataArray)
@@ -448,7 +445,8 @@ class Table @JvmOverloads constructor(
             linearLayout.setOnClickListener {
                 highlightRow(tableRow, newIndex, tableLayout, moreLayout, imageView, Text_at_1)
                 onRowClicked(tableRow, imageView, Text_at_1)
-                headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
+                setTopRowBackground(headRow)
+//                headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
                 linearLayout.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout2.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout3.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
@@ -481,7 +479,7 @@ class Table @JvmOverloads constructor(
     private fun onRowClicked(row: TableRow, imageView: ImageView, textAt1: LinearLayout) {
         if (row == selectedRow) {
             selectedRow = null
-            imageView.setImageResource(R.drawable.unckeck_circle_img) // Set the default image
+            imageView.setImageResource(R.drawable.ic_uncheck_circle_img) // Set the default image
             textAt1.background = getCellBackground()
         } else {
             selectedRow?.let { previousSelectedRow ->
@@ -489,10 +487,10 @@ class Table @JvmOverloads constructor(
                 val previousSelectedImageView = previousSelectedLinearLayout.getChildAt(0) as ImageView
                 val previousSelectedTextAt1 = previousSelectedRow.getChildAt(selectedRowCell) as LinearLayout
                 previousSelectedTextAt1.background = getCellBackground()
-                previousSelectedImageView.setImageResource(R.drawable.unckeck_circle_img) // Set the default image for the previously selected row
+                previousSelectedImageView.setImageResource(R.drawable.ic_uncheck_circle_img) // Set the default image for the previously selected row
             }
             selectedRow = row
-            imageView.setImageResource(R.drawable.ckeck_circle_img) // Set the selected image
+            imageView.setImageResource(R.drawable.ic_check_circle_img) // Set the selected image
         }
     }
 
@@ -611,6 +609,17 @@ class Table @JvmOverloads constructor(
         return buttonDrawable
     }
 
+    private fun setTopRowBackground(view: TableRow) {
+        val drawable = GradientDrawable()
+        drawable.setColor(Color.parseColor("#F3F4F8"))
+//        drawable.cornerRadius = 30f.dpToPx()
+        drawable.cornerRadii = floatArrayOf(
+            30f, 30f, 30f, 30f,
+            0f, 0f, 0f, 0f
+        ) // Top-left and top-right corners with radius, others with 0 radius
+
+        view.background = drawable
+    }
     fun createRoundedBackgroundForLastRow(radius: Float): GradientDrawable {
         val gradientDrawable = GradientDrawable()
         gradientDrawable.setStroke(2, Color.parseColor("#E2E3E7"))
@@ -785,20 +794,19 @@ class Table @JvmOverloads constructor(
             currentCell.background = getCellBackground()
             currentCell.clearFocus() // Clear the cursor position
 
-            // Get the row above the currently selected cell
+            // Get the row down the currently selected cell
             val rowAbove = tableLayout.getChildAt(selectedCellRowIndex + 1) as TableRow
 
-            // Get the cell in the row above at the same column index
+            // Get the cell in the row down at the same column index
             val cellAbove = rowAbove.getChildAt(selectedRowCell)
 
-            // Set the background for the selected cell in the row above
+            // Set the background for the selected cell in the row down
             cellAbove.background = getSelectedCellBackground()
 
-            // Set the cursor position in the selected cell in the row above
+            // Set the cursor position in the selected cell in the row down
             cellAbove.requestFocus()
         }
     }
-
 
     //Mark: Create Custom Buttons above Default Keyboard
     fun createKeyboardKey(editText: EditText, tableRow: TableRow, tableLayout: TableLayout, linearLayout: LinearLayout):LinearLayout{
@@ -817,7 +825,7 @@ class Table @JvmOverloads constructor(
         val leftKeyLayoutParams = LayoutParams(dpToPx(20), dpToPx(20))
         leftKey.layoutParams = leftKeyLayoutParams
         leftKeyLayoutParams.setMargins(0,0,0,0)
-        leftKey.setImageResource(R.drawable.left_key)
+        leftKey.setImageResource(R.drawable.ic_left_key)
         leftKeyLayout.addView(leftKey)
 
         val rightKeyLayout = LinearLayout(context)
@@ -831,7 +839,7 @@ class Table @JvmOverloads constructor(
         val rightKey = ImageView(context)
         val rightKeyLayoutParams = LayoutParams(dpToPx(20), dpToPx(20))
         rightKey.layoutParams = rightKeyLayoutParams
-        rightKey.setImageResource(R.drawable.right_key)
+        rightKey.setImageResource(R.drawable.ic_right_key)
         rightKeyLayout.addView(rightKey)
 
         val topKeyLayout = LinearLayout(context)
@@ -844,7 +852,7 @@ class Table @JvmOverloads constructor(
         val topKey = ImageView(context)
         val topKeyLayoutParams = LayoutParams(dpToPx(20), dpToPx(20))
         topKey.layoutParams = topKeyLayoutParams
-        topKey.setImageResource(R.drawable.up_key)
+        topKey.setImageResource(R.drawable.ic_up_key)
         topKeyLayout.addView(topKey)
 
         val downKeyLayout = LinearLayout(context)
@@ -857,7 +865,7 @@ class Table @JvmOverloads constructor(
         val downKey = ImageView(context)
         val downKeyLayoutParams = LayoutParams(dpToPx(20), dpToPx(20))
         downKey.layoutParams = downKeyLayoutParams
-        downKey.setImageResource(R.drawable.down_key)
+        downKey.setImageResource(R.drawable.ic_down_key)
         downKeyLayout.addView(downKey)
 
         leftKeyLayout.setOnClickListener {
@@ -1001,7 +1009,7 @@ class Table @JvmOverloads constructor(
 
     //Mark: Function for Insert Row below to the selected row
     fun insertBelowRow(){
-        val newDataItem = DataItem("New Text", R.drawable.img_box)
+        val newDataItem = DataItem("New Text", R.drawable.ic_img_box)
         val insertPosition = highlightedRowIndex
         dataArray.add(insertPosition, newDataItem)
         updateTableLayout(tableLayout, dataArray)
@@ -1056,6 +1064,7 @@ class Table @JvmOverloads constructor(
     fun updateTableLayout(tableLayout: TableLayout, dataArray: List<DataItem>) {
         tableLayout.removeAllViews()
         headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
+        setTopRowBackground(headRow)
         tableLayout.addView(headRow)
         dataArray.forEachIndexed { index, dataRow ->
             val newIndex = index+1
@@ -1225,6 +1234,7 @@ class Table @JvmOverloads constructor(
                 TextAtEditText.background = getCellBackground()
                 highlightRow(tableRow, newIndex, tableLayout, moreLayout, imageView, Text_at_1)
                 onRowClicked(tableRow, imageView, Text_at_1)
+                setTopRowBackground(headRow)
                 linearLayout.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout2.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout3.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
