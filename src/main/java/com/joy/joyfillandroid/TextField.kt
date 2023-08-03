@@ -24,8 +24,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
     }
 
     init {
-        // Read attributes from XML
-
         text = "Text Field"
         textSize = TextField.DEFAULT_TEXT_SIZE_SP
         val linearLayout = LinearLayout(context)
@@ -45,7 +43,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         val padding = resources.getDimensionPixelSize(R.dimen.custom_edittext_padding)
         setPadding(16, 0, 0, 10)
 
-        // Set default text color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             setTextColor(context!!.getColor(TextField.DEFAULT_TEXT_COLOR))
         }
@@ -72,23 +69,14 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
 
         isBold = typedArray.getBoolean(R.styleable.CustomTextView_boldText, false)
         isItalic = typedArray.getBoolean(R.styleable.CustomTextView_italicText, false) //
-
-
         applyProperties()
-
         typedArray.recycle()
     }
 
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(30,10,30,10)
-        setLayoutParams(layoutParams)
-        layoutParams.gravity = Gravity.CENTER_VERTICAL
+        OnDrawHelper.onDrawGlobal(context, this)
     }
 
 
