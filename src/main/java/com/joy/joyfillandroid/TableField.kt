@@ -99,8 +99,6 @@ class TableField(context: Context): LinearLayout(context){
             addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
             setMargins(0, dpToPx(12), dpToPx(1), 0)
         }
-
-
         plusThreeTextView.text = "+62"
         plusThreeTextView.setTextColor(Color.parseColor("#121417"))
         plusThreeTextView.textSize = 12f
@@ -229,12 +227,7 @@ class TableField(context: Context): LinearLayout(context){
     }
 
     override fun onDraw(canvas: Canvas?) {
-        val layoutParams = LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(dpToPx(12),dpToPx(12),dpToPx(12),dpToPx(12))
-        setLayoutParams(layoutParams)
+        OnDrawHelper.onDrawGlobal(context, this)
         super.onDraw(canvas)
 
     }

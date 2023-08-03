@@ -175,14 +175,13 @@ class Table @JvmOverloads constructor(
         )
 
         rootView.orientation = LinearLayout.VERTICAL
-        rootView.setPadding(5.dp, 5.dp, 5.dp, 5.dp)
 
         val horizontalScrollView = HorizontalScrollView(context)
         horizontalScrollView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        horizontalScrollView.setPadding(0, 5.dp, 0, 0)
+        horizontalScrollView.setPadding(0, 10.dp, 0, 0)
         horizontalScrollView.setHorizontalScrollBarEnabled(false);
         horizontalScrollView.viewTreeObserver.addOnScrollChangedListener(
             ViewTreeObserver.OnScrollChangedListener {
@@ -289,7 +288,7 @@ class Table @JvmOverloads constructor(
             val imageViewLayoutParams = TableRow.LayoutParams(15.dp, 15.dp)
             imageView.layoutParams = imageViewLayoutParams
             imageViewLayoutParams.setMargins(0, 10.dp, 0,0)
-            imageView.setImageResource(R.drawable.unckeck_circle_img)
+            imageView.setImageResource(R.drawable.unchecked_icon)
             linearLayout.addView(imageView)
             tableRow.addView(linearLayout)
 
@@ -498,12 +497,7 @@ class Table @JvmOverloads constructor(
         get() = (this * resources.displayMetrics.density).toInt()
 
     override fun onDraw(canvas: Canvas?) {
-        val layoutParams = LayoutParams(
-            LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(dpToPx(8),dpToPx(10),dpToPx(0),dpToPx(0))
-        setLayoutParams(layoutParams)
+        OnDrawHelper.onDrawGlobal(context, this)
         super.onDraw(canvas)
     }
 
@@ -1084,7 +1078,7 @@ class Table @JvmOverloads constructor(
             val imageViewLayoutParams = TableRow.LayoutParams(15.dp, 15.dp)
             imageView.layoutParams = imageViewLayoutParams
             imageViewLayoutParams.setMargins(0, 10.dp, 0,0)
-            imageView.setImageResource(R.drawable.unckeck_circle_img)
+            imageView.setImageResource(R.drawable.unchecked_icon)
             linearLayout.addView(imageView)
             tableRow.addView(linearLayout)
 
