@@ -72,7 +72,6 @@ class MultiDropDown @JvmOverloads constructor(
         }
 
         linearLayout.addView(autoCompleteTextView)
-
         return linearLayout
     }
 
@@ -197,6 +196,7 @@ class MultiDropDown @JvmOverloads constructor(
         return drawable
     }
 
+    //Mark: Update value 
     fun updateMultiDropDownvalue(multiDropDownTitle: String, hint: String, multiDropDownValue: String, listData: Array<String>){
         textField.text = multiDropDownTitle
         autoCompleteTextView.setHint(hint)

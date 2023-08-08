@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val context: Context): RecyclerView.Adapter<DropDownAdapter.ViewHolder>() {
 
-
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val context = parent.context
@@ -38,7 +37,6 @@ class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val c
         checkBox.buttonDrawable = null
         checkBox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.custom_checkbox, 0, 0, 0)
         checkBox.compoundDrawablePadding = dpToPx(context, 20)
-        checkBox.text = "Yes"
         checkBox.typeface = Typeface.create(null, 400, false)
         checkBox.textSize = 18f
         checkBox.setTextColor(Color.parseColor("#121417"))
