@@ -21,9 +21,9 @@ class Table @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr){
-    val width50dp = 50.dp
-    val width133dp = 133.dp
-    val height40dp = 40.dp
+    val width50dp = dpToPx(context,50)
+    val width133dp = dpToPx(context,133)
+    val height40dp = dpToPx(context,40)
     val textColor ="#121417"
     val tableBorderColor = "#F3F4F8"
     var highlightedRowIndex = -1
@@ -181,7 +181,7 @@ class Table @JvmOverloads constructor(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        horizontalScrollView.setPadding(0, 10.dp, 0, 0)
+        horizontalScrollView.setPadding(0, dpToPx(context,10), 0, 0)
         horizontalScrollView.setHorizontalScrollBarEnabled(false);
         horizontalScrollView.viewTreeObserver.addOnScrollChangedListener(
             ViewTreeObserver.OnScrollChangedListener {
@@ -285,9 +285,9 @@ class Table @JvmOverloads constructor(
             linearLayout.gravity = Gravity.CENTER_HORIZONTAL
             linearLayout.background = getCellBackground()
             val imageView = ImageView(context)
-            val imageViewLayoutParams = TableRow.LayoutParams(15.dp, 15.dp)
+            val imageViewLayoutParams = TableRow.LayoutParams(dpToPx(context,15), dpToPx(context,15))
             imageView.layoutParams = imageViewLayoutParams
-            imageViewLayoutParams.setMargins(0, 10.dp, 0,0)
+            imageViewLayoutParams.setMargins(0, dpToPx(context,10), 0,0)
             imageView.setImageResource(R.drawable.unchecked_icon)
             linearLayout.addView(imageView)
             tableRow.addView(linearLayout)
@@ -299,7 +299,7 @@ class Table @JvmOverloads constructor(
 
             val hash_Id = TextView(context)
             val hashIdLayoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT)
-            hashIdLayoutParams.setMargins(0, 10.dp, 0,0)
+            hashIdLayoutParams.setMargins(0, dpToPx(context,10), 0,0)
             hash_Id.layoutParams = hashIdLayoutParams
             hash_Id.setTextColor(Color.parseColor(textColor))
             hash_Id.setText(""+newIndex)
@@ -315,7 +315,7 @@ class Table @JvmOverloads constructor(
             val textat_1 = TableRow.LayoutParams(width133dp, TableRow.LayoutParams.MATCH_PARENT)
             TextAtEditText.background =  editTextBackground()
             TextAtEditText.layoutParams = textat_1
-            TextAtEditText.setPadding(10.dp, 10.dp,10.dp,10.dp)
+            TextAtEditText.setPadding(dpToPx(context,10), dpToPx(context,10),dpToPx(context,10),dpToPx(context,10))
             TextAtEditText.textSize = 12f
             TextAtEditText.setTextColor(Color.parseColor(textColor))
             TextAtEditText.setText(dataRow.text as String)
@@ -339,9 +339,9 @@ class Table @JvmOverloads constructor(
             linearLayout2.orientation = LinearLayout.HORIZONTAL
 
             val imageView2 = ImageView(context)
-            val imaageView2LayoutParams = LinearLayout.LayoutParams(25.dp, 25.dp)
+            val imaageView2LayoutParams = LinearLayout.LayoutParams(dpToPx(context,25), dpToPx(context,25))
             imageView2.layoutParams = imaageView2LayoutParams
-            imaageView2LayoutParams.setMargins(0,10.dp, 0,0)
+            imaageView2LayoutParams.setMargins(0,dpToPx(context,10), 0,0)
             imageView2.setImageResource(dataRow.imageResource as Int)
 
             val textView3 = TextView(context)
@@ -351,7 +351,7 @@ class Table @JvmOverloads constructor(
             )
             textView3.layoutParams = textView3LayoutParams
             textView3.textSize =12f
-            textView3LayoutParams.setMargins(1.dp, 18.dp, 0,0)
+            textView3LayoutParams.setMargins(dpToPx(context,1), dpToPx(context,18), 0,0)
             textView3.gravity = Gravity.BOTTOM
             textView3.setTextColor(Color.parseColor("#6B6C7C"))
             textView3.text = "+4"
@@ -407,17 +407,17 @@ class Table @JvmOverloads constructor(
                 TableRow.LayoutParams.WRAP_CONTENT,
             )
             textView6.layoutParams = textView6LayoutParams
-            textView6LayoutParams.setMargins(0,10.dp, 0,0)
+            textView6LayoutParams.setMargins(0,dpToPx(context,10), 0,0)
             textView6.setTextColor(Color.parseColor(textColor))
             textView6.text = "Text Feild"
             textView6.paintFlags = Paint.UNDERLINE_TEXT_FLAG
             textView6.textSize = 12f
             val imageView3 = ImageView(context)
-            val imageView3LayoutParams = TableRow.LayoutParams(20.dp, 20.dp)
+            val imageView3LayoutParams = TableRow.LayoutParams(dpToPx(context,20), dpToPx(context,20))
             imageView3.layoutParams = imageView3LayoutParams
-            imageView3LayoutParams.setMargins(0,10.dp,0,0)
+            imageView3LayoutParams.setMargins(0,dpToPx(context,10),0,0)
             imageView3.setImageResource(R.drawable.ic_expand_down)
-            imageView3.setPadding(5.dp, 0, 0, 0)
+            imageView3.setPadding(dpToPx(context,5), 0, 0, 0)
             linearLayout3.addView(textView6)
             linearLayout3.addView(imageView3)
             tableRow.addView(linearLayout3)
@@ -445,7 +445,6 @@ class Table @JvmOverloads constructor(
                 highlightRow(tableRow, newIndex, tableLayout, moreLayout, imageView, Text_at_1)
                 onRowClicked(tableRow, imageView, Text_at_1)
                 setTopRowBackground(headRow)
-//                headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
                 linearLayout.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout2.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
                 linearLayout3.background = createCellDrawableWithTopBottomStrokes(Color.parseColor("#E6E7EA"),2)
@@ -492,9 +491,6 @@ class Table @JvmOverloads constructor(
             imageView.setImageResource(R.drawable.ic_check_circle_img) // Set the selected image
         }
     }
-
-    private val Int.dp: Int
-        get() = (this * resources.displayMetrics.density).toInt()
 
     override fun onDraw(canvas: Canvas?) {
         OnDrawHelper.onDrawGlobal(context, this)
@@ -606,7 +602,6 @@ class Table @JvmOverloads constructor(
     private fun setTopRowBackground(view: TableRow) {
         val drawable = GradientDrawable()
         drawable.setColor(Color.parseColor("#F3F4F8"))
-//        drawable.cornerRadius = 30f.dpToPx()
         drawable.cornerRadii = floatArrayOf(
             30f, 30f, 30f, 30f,
             0f, 0f, 0f, 0f
@@ -1075,9 +1070,9 @@ class Table @JvmOverloads constructor(
             linearLayout.background = getCellBackground()
 
             val imageView = ImageView(context)
-            val imageViewLayoutParams = TableRow.LayoutParams(15.dp, 15.dp)
+            val imageViewLayoutParams = TableRow.LayoutParams(dpToPx(context,15), dpToPx(context,15))
             imageView.layoutParams = imageViewLayoutParams
-            imageViewLayoutParams.setMargins(0, 10.dp, 0,0)
+            imageViewLayoutParams.setMargins(0, dpToPx(context,10), 0,0)
             imageView.setImageResource(R.drawable.unchecked_icon)
             linearLayout.addView(imageView)
             tableRow.addView(linearLayout)
@@ -1089,7 +1084,7 @@ class Table @JvmOverloads constructor(
 
             val hash_Id = TextView(context)
             val hashIdLayoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT)
-            hashIdLayoutParams.setMargins(0, 10.dp, 0,0)
+            hashIdLayoutParams.setMargins(0, dpToPx(context,10), 0,0)
             hash_Id.layoutParams = hashIdLayoutParams
             hash_Id.setTextColor(Color.parseColor(textColor))
             hash_Id.setText(""+newIndex)
@@ -1105,7 +1100,7 @@ class Table @JvmOverloads constructor(
             val textat_1 = TableRow.LayoutParams(width133dp, TableRow.LayoutParams.MATCH_PARENT)
             TextAtEditText.background =  editTextBackground()
             TextAtEditText.layoutParams = textat_1
-            TextAtEditText.setPadding(10.dp, 10.dp,10.dp,10.dp)
+            TextAtEditText.setPadding(dpToPx(context,10), dpToPx(context,10),dpToPx(context,10),dpToPx(context,10))
             TextAtEditText.textSize = 12f
             TextAtEditText.setTextColor(Color.parseColor(textColor))
             TextAtEditText.setText(dataRow.text as String)
@@ -1129,9 +1124,9 @@ class Table @JvmOverloads constructor(
             linearLayout2.orientation = LinearLayout.HORIZONTAL
 
             val imageView2 = ImageView(context)
-            val imaageView2LayoutParams = LinearLayout.LayoutParams(25.dp, 25.dp)
+            val imaageView2LayoutParams = LinearLayout.LayoutParams(dpToPx(context,25), dpToPx(context,25))
             imageView2.layoutParams = imaageView2LayoutParams
-            imaageView2LayoutParams.setMargins(0,10.dp, 0,0)
+            imaageView2LayoutParams.setMargins(0,dpToPx(context,10), 0,0)
             imageView2.setImageResource(dataRow.imageResource as Int)
 
             val textView3 = TextView(context)
@@ -1141,7 +1136,7 @@ class Table @JvmOverloads constructor(
             )
             textView3.layoutParams = textView3LayoutParams
             textView3.textSize =12f
-            textView3LayoutParams.setMargins(1.dp, 18.dp, 0,0)
+            textView3LayoutParams.setMargins(dpToPx(context,1), dpToPx(context,18), 0,0)
             textView3.gravity = Gravity.BOTTOM
             textView3.setTextColor(Color.parseColor("#6B6C7C"))
             textView3.text = "+4"
@@ -1191,16 +1186,16 @@ class Table @JvmOverloads constructor(
                 TableRow.LayoutParams.WRAP_CONTENT,
             )
             textView6.layoutParams = textView6LayoutParams
-            textView6LayoutParams.setMargins(0,10.dp, 0,0)
+            textView6LayoutParams.setMargins(0,dpToPx(context,10), 0,0)
             textView6.setTextColor(Color.parseColor(textColor))
             textView6.text = "Text Feild"
 
             val imageView3 = ImageView(context)
-            val imageView3LayoutParams = TableRow.LayoutParams(20.dp, 20.dp)
+            val imageView3LayoutParams = TableRow.LayoutParams(dpToPx(context,20), dpToPx(context,20))
             imageView3.layoutParams = imageView3LayoutParams
-            imageView3LayoutParams.setMargins(0,10.dp,0,0)
+            imageView3LayoutParams.setMargins(0,dpToPx(context,10),0,0)
             imageView3.setImageResource(R.drawable.ic_baseline_down)
-            imageView3.setPadding(5.dp, 0, 0, 0)
+            imageView3.setPadding(dpToPx(context,5), 0, 0, 0)
 
             linearLayout3.setOnClickListener {
                 val multiDropDown = MultiDropDown(context)

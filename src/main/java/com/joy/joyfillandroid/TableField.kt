@@ -16,8 +16,9 @@ import androidx.annotation.RequiresApi
 @RequiresApi(Build.VERSION_CODES.P)
 class TableField(context: Context): LinearLayout(context){
 
-
+    val floorsTextView = TextView(context)
     val borderColor: String ="#E6E7EA"
+
 
     val dataList = listOf(
         arrayOf("First Floor", "Second Floor", "Third Floor"),
@@ -25,6 +26,8 @@ class TableField(context: Context): LinearLayout(context){
         arrayOf("Text 1 at 2", "Text 1 at 2", "Text 1 at 2"),
         arrayOf("Text 1 at 2", "Text 1 at 2", "Text 1 at 2")
     )
+
+    val dataLength = dataList.size -1
 
     init {
         orientation = VERTICAL
@@ -36,17 +39,16 @@ class TableField(context: Context): LinearLayout(context){
             RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT
         )
-        relativeLayout.setPadding(0, 0, 0, dpToPx(10))
+        relativeLayout.setPadding(0, 0, 0, dpToPx(context,10))
 
-        val floorsTextView = TextView(context)
+
         floorsTextView.layoutParams = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.WRAP_CONTENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT
         ).apply {
-            setMargins(0,dpToPx(10),0,dpToPx(0))
+            setMargins(0,dpToPx(context,10),0,dpToPx(context,0))
         }
 
-        floorsTextView.text = "Floors"
         floorsTextView.setTextColor(Color.parseColor("#3F404D"))
         floorsTextView.textSize = 14f
         floorsTextView.typeface = customTypeFace(500)
@@ -59,7 +61,7 @@ class TableField(context: Context): LinearLayout(context){
             addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
             addRule(RelativeLayout.RIGHT_OF, )
-            setMargins(0, 0, dpToPx(25), dpToPx(2))
+            setMargins(0, 0, dpToPx(context,20), dpToPx(context,2))
         }
         textViewLayout.orientation = LinearLayout.HORIZONTAL
         textViewLayout.gravity = LinearLayout.TEXT_ALIGNMENT_VIEW_END
@@ -73,11 +75,11 @@ class TableField(context: Context): LinearLayout(context){
         val arrowImageView = ImageView(context)
         arrowImageView.setImageResource(R.drawable.ic_expand_left)
         arrowImageView.layoutParams = LinearLayout.LayoutParams(
-            dpToPx(13),
-            dpToPx(13),
+            dpToPx(context,13),
+            dpToPx(context,13),
             1f
         ).apply {
-            setMargins(dpToPx(3), dpToPx(4), 0, 0)
+            setMargins(dpToPx(context,3), dpToPx(context,4), 0, 0)
 
         }
 
@@ -97,9 +99,9 @@ class TableField(context: Context): LinearLayout(context){
         ).apply {
             addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
             addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-            setMargins(0, dpToPx(12), dpToPx(1), 0)
+            setMargins(0, dpToPx(context,12), dpToPx(context,2), 0)
         }
-        plusThreeTextView.text = "+62"
+        plusThreeTextView.text = "+"+ dataLength
         plusThreeTextView.setTextColor(Color.parseColor("#121417"))
         plusThreeTextView.textSize = 12f
 
@@ -137,8 +139,8 @@ class TableField(context: Context): LinearLayout(context){
         for (i in data[0].indices) {
             val textView = TextView(context)
             val textViewParams = TableRow.LayoutParams(
-                dpToPx(133),
-                dpToPx(38),
+                dpToPx(context,133),
+                dpToPx(context,38),
                 1f
             )
             textView.gravity = Gravity.CENTER
@@ -177,8 +179,8 @@ class TableField(context: Context): LinearLayout(context){
             for (j in data[i].indices) {
                 val editText = EditText(context)
                 val editTextParams = TableRow.LayoutParams(
-                    dpToPx(133),
-                    dpToPx(38),
+                    dpToPx(context,133),
+                    dpToPx(context,38),
                     1f
 
                 )
@@ -240,7 +242,6 @@ class TableField(context: Context): LinearLayout(context){
 
     fun tableBackground(): GradientDrawable{
         val drawable = GradientDrawable()
-
         drawable.shape = GradientDrawable.RECTANGLE
         drawable.cornerRadii = floatArrayOf(
             30f,30f,
@@ -252,7 +253,8 @@ class TableField(context: Context): LinearLayout(context){
         return drawable
     }
 
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
+    //Mark: Function update values at run time
+    fun updateTableTitle(title: String){
+        floorsTextView.text = title
     }
 }
