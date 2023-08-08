@@ -16,6 +16,7 @@ class NumberField @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val linearLayout: LinearLayout
     private val textView: TextView
     private val editText: EditText
     private val imageView1: ImageView
@@ -30,8 +31,8 @@ class NumberField @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.number_field_layout, this, true)
-
         // Initialize views
+        linearLayout = findViewById(R.id.textField_layout)
         textView = findViewById(R.id.textView)
         editText = findViewById(R.id.editText)
         imageView1 = findViewById(R.id.imageView_1)
@@ -45,11 +46,8 @@ class NumberField @JvmOverloads constructor(
         }
         editText.inputType = InputType.TYPE_NULL
 
-
-
         // Apply custom attributes if needed
         attrs?.let { applyCustomAttributes(context, it) }
-
 
         imageView1.setOnClickListener{
             number += 1
@@ -60,35 +58,18 @@ class NumberField @JvmOverloads constructor(
             number -= 1
             editText.setText(""+number)
         }
-
     }
 
     private fun applyCustomAttributes(context: Context, attrs: AttributeSet) {
         val typedArray = context.obtainStyledAttributes(attrs, R.styleable.CustomLinearLayout)
-
-        // Apply custom attributes to views if needed
-        // For example, you can set text and image using attributes
-
-//        val text = typedArray.getString(R.styleable.CustomLinearLayout_text)
-//        textView.text = text
-
-//        val imageResId = typedArray.getResourceId(R.styleable.CustomLinearLayout_image, 0)
-//        imageView.setImageResource(imageResId)
-
-
         typedArray.recycle()
     }
 
-    fun getText(): String {
-        return editText.text.toString()
-    }
-
-    fun setImageResource1(resId: Int) {
-        imageView1.setImageResource(resId)
-    }
-
-    fun setImageResource2(resId: Int) {
-        imageView2.setImageResource(resId)
+    // Mark: Function update values at run time
+    fun updateNumberFieldValue(numberTitle: String, numberValue: Int){
+        textView.text = numberTitle
+        number = numberValue
+        editText.setText(""+numberValue)
     }
 
 }
