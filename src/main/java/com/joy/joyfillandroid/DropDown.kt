@@ -23,13 +23,17 @@ class DropDown @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     val autoCompleteTextView = AppCompatAutoCompleteTextView(context)
+    val textField = TextField(context)
     private lateinit var bottomSheetDialog: BottomSheetDialog
+    var optionYes =""
+    var optionNo =""
+    var optionNA =""
+
 
     init {
-
-        addView(createAutoCompleteTextView(context))
-
+     addView(createAutoCompleteTextView(context))
     }
+
     fun createAutoCompleteTextView(context: Context): LinearLayout {
         val linearLayout = LinearLayout(context)
 
@@ -37,29 +41,25 @@ class DropDown @JvmOverloads constructor(
         linearLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         linearLayout.gravity = Gravity.START
 
-        val textField = TextField(context)
-        textField.text ="Dropdown Field"
         linearLayout.addView(textField)
         val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-
         val backgroundDrawable = createEditTextBackground()
 
         autoCompleteTextView.id = R.id.autoTextView
         autoCompleteTextView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         autoCompleteTextView.background= backgroundDrawable
-        autoCompleteTextView.hint = "Option 1"
         autoCompleteTextView.textSize = 14f
         autoCompleteTextView.setTextColor(Color.parseColor("#121417"))
         autoCompleteTextView.inputType = InputType.TYPE_NULL
         autoCompleteTextView.setPadding(
-            convertDpToPx(context, 15),
-            convertDpToPx(context, 15),
-            convertDpToPx(context, 15),
-            convertDpToPx(context, 15)
+            dpToPx(context, 15),
+            dpToPx(context, 15),
+            dpToPx(context, 15),
+            dpToPx(context, 15)
         )
         autoCompleteTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_down_24, 0)
         autoCompleteTextView.layoutParams = layoutParams
-        layoutParams.setMargins(convertDpToPx(context, 12), convertDpToPx(context, 5),convertDpToPx(context, 12), 0)
+        layoutParams.setMargins(dpToPx(context, 12), dpToPx(context, 5),dpToPx(context, 12), dpToPx(context, 10))
 
 
         autoCompleteTextView.setOnTouchListener { view, motionEvent ->
@@ -74,23 +74,19 @@ class DropDown @JvmOverloads constructor(
         return linearLayout
     }
 
-    fun convertDpToPx(context: Context, dp: Int): Int {
-        return (dp * context.resources.displayMetrics.density).toInt()
-    }
-
 
     fun createEditTextBackground(): GradientDrawable {
         val drawable = GradientDrawable()
-        drawable.setStroke(convertDpToPx(context, 1), Color.parseColor("#D1D1D6"))
+        drawable.setStroke(dpToPx(context, 1), Color.parseColor("#D1D1D6"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             drawable.setPadding(
-                convertDpToPx(context,7),
-                convertDpToPx(context,7),
-                convertDpToPx(context,7),
-                convertDpToPx(context,7)
+                dpToPx(context,7),
+                dpToPx(context,7),
+                dpToPx(context,7),
+                dpToPx(context,7)
             )
         }
-        drawable.cornerRadius = convertDpToPx(context,12).toFloat()
+        drawable.cornerRadius = dpToPx(context,12).toFloat()
         drawable.setColor(Color.parseColor("#FFFFFF"))
 
         return drawable
@@ -102,13 +98,13 @@ class DropDown @JvmOverloads constructor(
         drawable.setStroke(3, Color.parseColor("#4776EE"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             drawable.setPadding(
-                convertDpToPx(context,7),
-                convertDpToPx(context,7),
-                convertDpToPx(context,7),
-                convertDpToPx(context,7)
+                dpToPx(context,7),
+                dpToPx(context,7),
+                dpToPx(context,7),
+                dpToPx(context,7)
             )
         }
-        drawable.cornerRadius = convertDpToPx(context,12).toFloat()
+        drawable.cornerRadius = dpToPx(context,12).toFloat()
         drawable.setColor(Color.parseColor("#FFFFFF"))
 
         return drawable
@@ -123,20 +119,20 @@ class DropDown @JvmOverloads constructor(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT
         )
-        layoutParams.setMargins(0, convertDpToPx(context,15),0,convertDpToPx(context,30))
+        layoutParams.setMargins(0, dpToPx(context,15),0,dpToPx(context,30))
         linearLayout.layoutParams = layoutParams
 
         linearLayout.orientation = LinearLayout.VERTICAL
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             linearLayout.background = context.getDrawable(R.drawable.bottom_sheet_background)
         }
-        linearLayout.setPadding(0, 0, 0, 5.dpToPx(context))
+        linearLayout.setPadding(0, 0, 0, dpToPx(context, 5))
 
-        val checkboxYes = createCustomCheckbox(context, "Yes")
+        val checkboxYes = createCustomCheckbox(context, optionYes)
         val view1 = createSeparatorView(context)
-        val checkboxNo = createCustomCheckbox(context, "No")
+        val checkboxNo = createCustomCheckbox(context, optionNo)
         val view2 = createSeparatorView(context)
-        val checkboxNA = createCustomCheckbox(context, "N/A")
+        val checkboxNA = createCustomCheckbox(context, optionNA)
         val view3 = createSeparatorView(context)
 
         linearLayout.addView(checkboxYes)
@@ -170,9 +166,9 @@ class DropDown @JvmOverloads constructor(
                 0
             )
         }
-        checkBox.compoundDrawablePadding = 20.dpToPx(context)
+        checkBox.compoundDrawablePadding = dpToPx(context, 20)
         checkBox.textSize = 18f
-        checkBox.setPadding(24.dpToPx(context), 14.dpToPx(context), 0, 14.dpToPx(context))
+        checkBox.setPadding(dpToPx(context, 24), dpToPx(context, 14), 0, dpToPx(context, 14))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkBox.setTextColor(context.getColor(R.color.black))
         }
@@ -188,10 +184,10 @@ class DropDown @JvmOverloads constructor(
                 checkBox.setBackgroundColor(Color.parseColor("#E3E3E3"))
                 autoCompleteTextView.background = backgroundDrawable1
                 autoCompleteTextView.setPadding(
-                    convertDpToPx(context, 15),
-                    convertDpToPx(context, 15),
-                    convertDpToPx(context, 15),
-                    convertDpToPx(context, 15)
+                    dpToPx(context, 15),
+                    dpToPx(context, 15),
+                    dpToPx(context, 15),
+                    dpToPx(context, 15)
                 )
                 bottomSheetDialog.dismiss()
             }
@@ -204,7 +200,7 @@ class DropDown @JvmOverloads constructor(
         val separatorView = View(context)
         separatorView.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            1.dpToPx(context)
+            dpToPx(context, 1)
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             separatorView.setBackgroundColor(context.getColor(R.color.gray))
@@ -212,9 +208,12 @@ class DropDown @JvmOverloads constructor(
         return separatorView
     }
 
-    private fun Int.dpToPx(context: Context): Int {
-        val scale = context.resources.displayMetrics.density
-        return (this * scale + 0.5f).toInt()
+    fun updateValue(textTitle: String, hint: String, textValue: String, YesCheck:String, NoCheck:String, NACheck:String){
+        textField.text = textTitle
+        autoCompleteTextView.setHint(hint)
+        autoCompleteTextView.setText(textValue)
+        optionYes = YesCheck
+        optionNo = NoCheck
+        optionNA = NACheck
     }
-
 }
