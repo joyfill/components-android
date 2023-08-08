@@ -7,6 +7,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -23,14 +24,13 @@ class MultipleChoice @JvmOverloads constructor(
     defStyleAttr: Int =0
 ) : LinearLayout(context, attrs, defStyleAttr){
 
-    private val multiSelection = false
-    private val multipleChoiceDspMode ="readonly"
-
     private val textColor ="#121417"
     private val white ="#FFFFFF"
     private val borderGrey="#D1D1D6"
     private val blue = "#256FFF"
-    private val containerBorderColor="#D1D1D6"
+
+    val label = TextView(context)
+    val checkBoxList = RecyclerView(context)
 
     var list= ArrayList<MultiPleChoiceModel>()
     private lateinit var adapter: MutlipleChoiceAdapter
@@ -39,15 +39,13 @@ class MultipleChoice @JvmOverloads constructor(
         orientation = VERTICAL
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            dpToPx(190)
+            dpToPx(context, 190)
         )
-        layoutParams.setMargins(dpToPx(10),dpToPx(10),dpToPx(10),dpToPx(10))
+        layoutParams.setMargins(dpToPx(context,10),dpToPx(context,10),dpToPx(context,10),dpToPx(context,10))
         setLayoutParams(layoutParams)
 
-        val label = TextView(context)
-        label.text = "MultiChoice Field"
         val labelLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        labelLayoutParams.setMargins(0, 0,0,dpToPx(8))
+        labelLayoutParams.setMargins(0, 0,0,dpToPx(context,8))
         label.layoutParams = labelLayoutParams
         label.setTextColor(Color.parseColor(textColor))
         label.textSize = 16f
@@ -55,33 +53,26 @@ class MultipleChoice @JvmOverloads constructor(
         addView(label)
 
         val multiChoiceContainer = LinearLayout(context)
-        val containerLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dpToPx(140))
+        val containerLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dpToPx(context,138))
         multiChoiceContainer.layoutParams = containerLayoutParams
-        multiChoiceContainer.background = containerBackground(containerBorderColor)
+        multiChoiceContainer.background = containerBackground(borderGrey)
 
-        val checkBoxList = RecyclerView(context)
-        checkBoxList.background = recyclerViewBackground(containerBorderColor)
+        checkBoxList.background = recyclerViewBackground(borderGrey)
         val checkBoxListLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         checkBoxList.layoutParams = checkBoxListLayoutParams
-        checkBoxListLayoutParams.setMargins(5,5,5,5)
+        checkBoxList.setPadding(dpToPx(context,1),dpToPx(context,1),dpToPx(context,1),dpToPx(context,3))
         checkBoxList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL,false)
+        checkBoxList.isVerticalScrollBarEnabled = true
+        checkBoxList.overScrollMode= View.OVER_SCROLL_NEVER
 
-        list = ArrayList()
-        list.add(MultiPleChoiceModel("Item One", false))
-        list.add(MultiPleChoiceModel("Item Two",false))
-        list.add(MultiPleChoiceModel("Item Three", false))
-        list.add(MultiPleChoiceModel("Item Four", false))
-
-        adapter = MutlipleChoiceAdapter(list, getContext(),multiSelection, multipleChoiceDspMode)
-        checkBoxList.adapter = adapter
         multiChoiceContainer.addView(checkBoxList)
         addView(multiChoiceContainer)
     }
 
     private fun containerBackground(color: String): GradientDrawable{
         val drawable = GradientDrawable()
-        drawable.cornerRadius = 50f
-        drawable.setStroke(4, Color.parseColor(color))
+        drawable.cornerRadius = 30f
+        drawable.setStroke(2, Color.parseColor(color))
         drawable.shape = GradientDrawable.RECTANGLE
         drawable.setColor(Color.parseColor("#FFFFFF"))
         return drawable
@@ -94,7 +85,14 @@ class MultipleChoice @JvmOverloads constructor(
         return drawable
     }
 
-    private fun dpToPx(dp: Int): Int {
-        return (dp * resources.displayMetrics.density).toInt()
+    //Mark: update dynamic values
+    fun setLabelText(newText: String, itemTexts: Array<String>, multiSelection: Boolean, multipleChoiceDspMode: String, selected: Boolean) {
+        label.text = newText
+        list = ArrayList()
+        for (text in itemTexts) {
+            list.add(MultiPleChoiceModel(text, selected))
+        }
+        adapter = MutlipleChoiceAdapter(list, context, multiSelection, multipleChoiceDspMode)
+        checkBoxList.adapter = adapter
     }
 }
