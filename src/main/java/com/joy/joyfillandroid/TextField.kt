@@ -24,7 +24,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
     }
 
     init {
-        text = "Text Field"
         textSize = TextField.DEFAULT_TEXT_SIZE_SP
         val linearLayout = LinearLayout(context)
         val layoutParams = LinearLayout.LayoutParams(
@@ -46,7 +45,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             setTextColor(context!!.getColor(TextField.DEFAULT_TEXT_COLOR))
         }
-
 
         val typedArray = context!!.obtainStyledAttributes(R.styleable.CustomTextView)
 
