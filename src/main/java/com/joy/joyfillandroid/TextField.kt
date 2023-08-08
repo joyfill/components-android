@@ -24,8 +24,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
     }
 
     init {
-
-        text = "Text Field"
         textSize = TextField.DEFAULT_TEXT_SIZE_SP
         val linearLayout = LinearLayout(context)
         val layoutParams = LinearLayout.LayoutParams(
@@ -48,7 +46,6 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
             setTextColor(context!!.getColor(TextField.DEFAULT_TEXT_COLOR))
         }
 
-
         val typedArray = context!!.obtainStyledAttributes(R.styleable.CustomTextView)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -69,24 +66,15 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         )
 
         isBold = typedArray.getBoolean(R.styleable.CustomTextView_boldText, false)
-        isItalic = typedArray.getBoolean(R.styleable.CustomTextView_italicText, false) 
-
-
+        isItalic = typedArray.getBoolean(R.styleable.CustomTextView_italicText, false) //
         applyProperties()
-
         typedArray.recycle()
     }
 
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(30,10,30,10)
-        setLayoutParams(layoutParams)
-        layoutParams.gravity = Gravity.CENTER_VERTICAL
+        OnDrawHelper.onDrawGlobal(context, this)
     }
 
 
@@ -101,29 +89,29 @@ class TextField(context: Context?) : AppCompatTextView(context!!) {
         setFontName(fontName)
     }
 
-    //Use to set the border color of textField's text ...
+    // Sets the border color text of the textField
     fun setBorderColor(color: Int) {
         borderColor = color
         updateBorder()
     }
 
-    //Use to set the border corner radius of textField's text ... 
+    // Sets the corner radius text of the textField
     fun setCornerRadius(radius: Int) {
         cornerRadius = radius
         updateBorder()
     }
-    //Use to set the border width of textField's text ...
+    // Sets the border with text of the textField
     fun setBorderWidth(width: Int) {
         borderWidth = width
         updateBorder()
     }
 
-    //Use to set the bold text of the textField ...
+    // Sets the bold text of the textField
     fun setBold(isBold: Boolean) {
         this.isBold = isBold
         updateTextStyle()
     }
-    // Sets the italic text of the textField
+    // Sets the italice text of the textField
     fun setItalic(isItalic: Boolean) {
         this.isItalic = isItalic
         updateTextStyle()

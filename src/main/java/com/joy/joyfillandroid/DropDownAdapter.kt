@@ -33,25 +33,24 @@ class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val c
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        checkBoxParams.setMargins(0, convertDpToPx(context, 0), 0, convertDpToPx(context, 0))
+        checkBoxParams.setMargins(0, dpToPx(context, 0), 0, dpToPx(context, 0))
         checkBox.layoutParams = checkBoxParams
         checkBox.buttonDrawable = null
         checkBox.setCompoundDrawablesWithIntrinsicBounds(R.drawable.custom_checkbox, 0, 0, 0)
-        checkBox.compoundDrawablePadding = convertDpToPx(context, 20)
+        checkBox.compoundDrawablePadding = dpToPx(context, 20)
         checkBox.text = "Yes"
         checkBox.typeface = Typeface.create(null, 400, false)
         checkBox.textSize = 18f
         checkBox.setTextColor(Color.parseColor("#121417"))
-        checkBox.setPadding(convertDpToPx(context, 24), convertDpToPx(context, 14), 0, convertDpToPx(context, 14))
+        checkBox.setPadding(dpToPx(context, 24), dpToPx(context, 14), 0, dpToPx(context, 14))
 
         val divider = View(context)
         val dividerParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            convertDpToPx(context, 1)
+            dpToPx(context, 1)
         )
         divider.layoutParams = dividerParams
         divider.setBackgroundColor(Color.parseColor("#DBDBDD"))
-
         container.addView(checkBox)
         container.addView(divider)
 
@@ -60,12 +59,8 @@ class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val c
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val list = mlist[position]
-
-
         holder.checkBox.setText(list.checkBox)
-
         holder.checkBox.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
- 
             if (buttonView.isChecked) {
                 holder.checkBox.setBackgroundColor(Color.parseColor("#E3E3E3"))
             } else {
@@ -79,8 +74,5 @@ class DropDownAdapter(private val mlist: ArrayList<RecyclerModel>, private val c
     }
 
     class ViewHolder(container: LinearLayout, var checkBox: CheckBox) : RecyclerView.ViewHolder(container)
-    private fun convertDpToPx(context: Context, dp: Int): Int {
-        val scale = context.resources.displayMetrics.density
-        return (dp * scale + 0.5f).toInt()
-    }
+
 }
