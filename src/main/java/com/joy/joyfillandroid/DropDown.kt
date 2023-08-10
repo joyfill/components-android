@@ -8,13 +8,19 @@ import android.os.Build
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.KeyEvent.ACTION_UP
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatAutoCompleteTextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import org.json.JSONArray
 
 class DropDown @JvmOverloads constructor(
     context: Context,
@@ -22,16 +28,15 @@ class DropDown @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private lateinit var adapter: DropDownAdapter
     val autoCompleteTextView = AppCompatAutoCompleteTextView(context)
-    val textField = TextField(context)
     private lateinit var bottomSheetDialog: BottomSheetDialog
-    var optionYes =""
-    var optionNo =""
-    var optionNA =""
-
+    var list= ArrayList<RecyclerModel>()
+    val textField = TextField(context)
+    val recyclerView = RecyclerView(context)
 
     init {
-     addView(createAutoCompleteTextView(context))
+        addView(createAutoCompleteTextView(context))
     }
 
     fun createAutoCompleteTextView(context: Context): LinearLayout {
@@ -43,6 +48,7 @@ class DropDown @JvmOverloads constructor(
 
         linearLayout.addView(textField)
         val layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        layoutParams.setMargins(0,dpToPx(context, 10),0,dpToPx(context, 10))
         val backgroundDrawable = createEditTextBackground()
 
         autoCompleteTextView.id = R.id.autoTextView
@@ -59,12 +65,12 @@ class DropDown @JvmOverloads constructor(
         )
         autoCompleteTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_down_24, 0)
         autoCompleteTextView.layoutParams = layoutParams
-        layoutParams.setMargins(dpToPx(context, 12), dpToPx(context, 5),dpToPx(context, 12), dpToPx(context, 10))
+        layoutParams.setMargins(dpToPx(context, 12), dpToPx(context, 5),dpToPx(context, 12), 0)
 
 
         autoCompleteTextView.setOnTouchListener { view, motionEvent ->
-            if (motionEvent.action == ACTION_UP) {
-                createCustomCheckboxLayout(context)
+            if (motionEvent.action == KeyEvent.ACTION_UP) {
+                createLinearLayout(context)
             }
             return@setOnTouchListener false
         }
@@ -74,10 +80,49 @@ class DropDown @JvmOverloads constructor(
         return linearLayout
     }
 
+    fun createLinearLayout(context: Context): LinearLayout {
+        val linearLayout = LinearLayout(context)
+        linearLayout.orientation = LinearLayout.VERTICAL
+        linearLayout.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            linearLayout.background = context.getDrawable(R.drawable.bottom_sheet_background)
+        }
+
+        val layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        layoutParams.gravity = Gravity.END
+        layoutParams.topMargin = dpToPx(context, 15)
+        layoutParams.rightMargin = dpToPx(context, 24)
+        layoutParams.bottomMargin = dpToPx(context, 12)
+
+        val recyclerViewParent = recyclerView.parent as? ViewGroup
+        recyclerViewParent?.removeView(recyclerView)
+
+        val recyclerViewLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dpToPx(context, 200))
+        recyclerView.layoutParams = recyclerViewLayoutParams
+        recyclerViewLayoutParams.setMargins(0, dpToPx(context,20),0, dpToPx(context, 10))
+
+        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL,false)
+        recyclerView.hasFixedSize()
+        recyclerView.addOnItemTouchListener(RecyclerItemClickListenr(context, recyclerView, object : RecyclerItemClickListenr.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+                autoCompleteTextView.setText(list.get(position).checkBox)
+                autoCompleteTextView.background = createEditTextBackgroundOnTextChange()
+                bottomSheetDialog.dismiss()
+            }
+        }))
+
+        linearLayout.addView(recyclerView)
+        bottomSheetDialog = BottomSheetDialog(context, R.style.BottomSheetDialogStyle)
+        bottomSheetDialog.setContentView(linearLayout)
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheetDialog.show()
+        return linearLayout
+    }
 
     fun createEditTextBackground(): GradientDrawable {
         val drawable = GradientDrawable()
-        drawable.setStroke(dpToPx(context, 1), Color.parseColor("#D1D1D6"))
+        drawable.setStroke(dpToPx(context,1), Color.parseColor("#D1D1D6"))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             drawable.setPadding(
                 dpToPx(context,7),
@@ -88,10 +133,8 @@ class DropDown @JvmOverloads constructor(
         }
         drawable.cornerRadius = dpToPx(context,12).toFloat()
         drawable.setColor(Color.parseColor("#FFFFFF"))
-
         return drawable
     }
-
 
     fun createEditTextBackgroundOnTextChange(): GradientDrawable {
         val drawable = GradientDrawable()
@@ -106,114 +149,22 @@ class DropDown @JvmOverloads constructor(
         }
         drawable.cornerRadius = dpToPx(context,12).toFloat()
         drawable.setColor(Color.parseColor("#FFFFFF"))
-
         return drawable
     }
 
-
-    //Bottom Sheet UI
-    fun createCustomCheckboxLayout(context: Context): LinearLayout {
-        val linearLayout = LinearLayout(context)
-
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
-        )
-        layoutParams.setMargins(0, dpToPx(context,15),0,dpToPx(context,30))
-        linearLayout.layoutParams = layoutParams
-
-        linearLayout.orientation = LinearLayout.VERTICAL
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            linearLayout.background = context.getDrawable(R.drawable.bottom_sheet_background)
-        }
-        linearLayout.setPadding(0, 0, 0, dpToPx(context, 5))
-
-        val checkboxYes = createCustomCheckbox(context, optionYes)
-        val view1 = createSeparatorView(context)
-        val checkboxNo = createCustomCheckbox(context, optionNo)
-        val view2 = createSeparatorView(context)
-        val checkboxNA = createCustomCheckbox(context, optionNA)
-        val view3 = createSeparatorView(context)
-
-        linearLayout.addView(checkboxYes)
-        linearLayout.addView(view1)
-        linearLayout.addView(checkboxNo)
-        linearLayout.addView(view2)
-        linearLayout.addView(checkboxNA)
-        linearLayout.addView(view3)
-
-        bottomSheetDialog = BottomSheetDialog(context, R.style.BottomSheetDialogStyle)
-        bottomSheetDialog.setContentView(linearLayout)
-        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheetDialog.show()
-
-        return linearLayout
-    }
-
-    // Check box functionality
-    private fun createCustomCheckbox(context: Context, text: String): CheckBox {
-        val checkBox = CheckBox(context)
-        checkBox.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        checkBox.buttonDrawable = null
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            checkBox.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                R.drawable.custom_checkbox,
-                0,
-                0,
-                0
-            )
-        }
-        checkBox.compoundDrawablePadding = dpToPx(context, 20)
-        checkBox.textSize = 18f
-        checkBox.setPadding(dpToPx(context, 24), dpToPx(context, 14), 0, dpToPx(context, 14))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkBox.setTextColor(context.getColor(R.color.black))
-        }
-        checkBox.text = text
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            checkBox.typeface = Typeface.create(null, 400, false)
-        }
-
-        checkBox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                autoCompleteTextView.setText(text)
-                val backgroundDrawable1 = createEditTextBackgroundOnTextChange()
-                checkBox.setBackgroundColor(Color.parseColor("#E3E3E3"))
-                autoCompleteTextView.background = backgroundDrawable1
-                autoCompleteTextView.setPadding(
-                    dpToPx(context, 15),
-                    dpToPx(context, 15),
-                    dpToPx(context, 15),
-                    dpToPx(context, 15)
-                )
-                bottomSheetDialog.dismiss()
-            }
-        }
-
-        return checkBox
-    }
-
-    private fun createSeparatorView(context: Context): View {
-        val separatorView = View(context)
-        separatorView.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            dpToPx(context, 1)
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            separatorView.setBackgroundColor(context.getColor(R.color.gray))
-        }
-        return separatorView
-    }
-
-    fun updateValue(textTitle: String, hint: String, textValue: String, YesCheck:String, NoCheck:String, NACheck:String){
-        textField.text = textTitle
+    // Mark: Function for update values at run time
+    fun updateDropDownvalue(multiDropDownTitle: String, hint: String, multiDropDownValue: String, listData: JSONArray){
+        textField.text = multiDropDownTitle
         autoCompleteTextView.setHint(hint)
-        autoCompleteTextView.setText(textValue)
-        optionYes = YesCheck
-        optionNo = NoCheck
-        optionNA = NACheck
+        autoCompleteTextView.setText(multiDropDownValue)
+        list = ArrayList()
+        for (i in 0 until listData.length()) {
+            val item = listData.getJSONObject(i)
+            val checkBoxValue = item.optString("value", "")
+            list.add(RecyclerModel(checkBoxValue))
+        }
+        adapter = DropDownAdapter(list, context)
+        recyclerView.adapter= adapter
     }
+
 }
