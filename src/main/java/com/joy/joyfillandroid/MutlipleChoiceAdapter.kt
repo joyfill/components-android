@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.joy.joyfillandroid.R
 import com.joy.joyfillandroid.dpToPx
@@ -22,9 +23,6 @@ class MutlipleChoiceAdapter (private val mList: ArrayList<MultiPleChoiceModel>, 
 
     private var selectedItemPosition: Int = -1
     private val textColor ="#121417"
-    private val white ="#FFFFFF"
-    private val borderGrey="#D1D1D6"
-    private val blue = "#256FFF"
     private val containerBorderColor="#E2E3E7"
 
 
@@ -40,8 +38,6 @@ class MutlipleChoiceAdapter (private val mList: ArrayList<MultiPleChoiceModel>, 
         )
         container.orientation = LinearLayout.VERTICAL
         container.gravity = Gravity.CENTER
-        container.setBackgroundColor(Color.parseColor(white))
-        container.background = containerBackground()
 
         val checkBox = CheckBox(context)
         val checkBoxParams = LinearLayout.LayoutParams(
@@ -83,9 +79,9 @@ class MutlipleChoiceAdapter (private val mList: ArrayList<MultiPleChoiceModel>, 
             holder.checkBox.isClickable = false
         }
 
-        if (position == mList.size - 1) {
+        if(position == mList.size -1){
             holder.divider.setBackgroundColor(Color.TRANSPARENT)
-        } else{
+        }else{
             holder.divider.setBackgroundColor(Color.parseColor(containerBorderColor))
         }
     }
@@ -126,13 +122,6 @@ class MutlipleChoiceAdapter (private val mList: ArrayList<MultiPleChoiceModel>, 
             list.isSelected = false
             selectedItemPosition = RecyclerView.NO_POSITION
         }
-    }
-
-    private fun containerBackground(): GradientDrawable {
-        val drawable = GradientDrawable()
-        drawable.cornerRadius = 50f
-        drawable.shape = GradientDrawable.RECTANGLE
-        return drawable
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -176,5 +165,5 @@ class MutlipleChoiceAdapter (private val mList: ArrayList<MultiPleChoiceModel>, 
         checkBox.buttonDrawable = selector
     }
 
-    class ViewHolder(container: LinearLayout, var checkBox: CheckBox, val divider: View) : RecyclerView.ViewHolder(container)
+    class ViewHolder(val container: LinearLayout, var checkBox: CheckBox, val divider: View) : RecyclerView.ViewHolder(container)
 }

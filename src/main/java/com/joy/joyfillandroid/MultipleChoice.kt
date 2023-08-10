@@ -25,9 +25,7 @@ class MultipleChoice @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr){
 
     private val textColor ="#121417"
-    private val white ="#FFFFFF"
     private val borderGrey="#D1D1D6"
-    private val blue = "#256FFF"
 
     val label = TextView(context)
     val checkBoxList = RecyclerView(context)
@@ -41,9 +39,8 @@ class MultipleChoice @JvmOverloads constructor(
             LinearLayout.LayoutParams.MATCH_PARENT,
             dpToPx(context, 190)
         )
-        layoutParams.setMargins(dpToPx(context,10),dpToPx(context,10),dpToPx(context,10),dpToPx(context,10))
+        layoutParams.setMargins(dpToPx(context,10),dpToPx(context,0),dpToPx(context,10),dpToPx(context,0))
         setLayoutParams(layoutParams)
-
         val labelLayoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         labelLayoutParams.setMargins(0, 0,0,dpToPx(context,8))
         label.layoutParams = labelLayoutParams
@@ -58,35 +55,33 @@ class MultipleChoice @JvmOverloads constructor(
         multiChoiceContainer.background = containerBackground(borderGrey)
 
         checkBoxList.background = recyclerViewBackground(borderGrey)
-        val checkBoxListLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val checkBoxListLayoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dpToPx(context,138))
+        containerLayoutParams.setMargins(dpToPx(context,1), dpToPx(context,2),dpToPx(context,1),dpToPx(context,1))
         checkBoxList.layoutParams = checkBoxListLayoutParams
-        checkBoxList.setPadding(dpToPx(context,1),dpToPx(context,1),dpToPx(context,1),dpToPx(context,3))
+        checkBoxList.setPadding(dpToPx(context,1),dpToPx(context,5),dpToPx(context,1),dpToPx(context,5))
         checkBoxList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL,false)
-        checkBoxList.isVerticalScrollBarEnabled = true
         checkBoxList.overScrollMode= View.OVER_SCROLL_NEVER
-
-        multiChoiceContainer.addView(checkBoxList)
-        addView(multiChoiceContainer)
+        addView(checkBoxList)
     }
 
     private fun containerBackground(color: String): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadius = 30f
-        drawable.setStroke(2, Color.parseColor(color))
+        drawable.setStroke(3, Color.parseColor(color))
         drawable.shape = GradientDrawable.RECTANGLE
-        drawable.setColor(Color.parseColor("#FFFFFF"))
         return drawable
     }
 
     private fun recyclerViewBackground(color: String): GradientDrawable{
         val drawable = GradientDrawable()
-        drawable.cornerRadius = 50f
+        drawable.cornerRadius = 30f
+        drawable.setStroke(3, Color.parseColor(color))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
 
-    //Mark: update dynamic values
-    fun setLabelText(newText: String, itemTexts: Array<String>, multiSelection: Boolean, multipleChoiceDspMode: String, selected: Boolean) {
+    //Mark: Function update values at run time
+    fun setTextValue(newText: String, itemTexts: Array<String>, multiSelection: Boolean, multipleChoiceDspMode: String, selected: Boolean) {
         label.text = newText
         list = ArrayList()
         for (text in itemTexts) {
