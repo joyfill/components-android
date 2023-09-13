@@ -6,8 +6,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.joy.joyfillandroid.dpToPx
-
+import com.joy.joyfillandroid.dpToPx\
 
 class TableViewActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)

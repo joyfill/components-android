@@ -29,8 +29,6 @@ class Table @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr){
-    val width50dp = dpToPx(context,50)
-    val width133dp = dpToPx(context,133)
     val textColor ="#121417"
     val headRowBackgroundColor = "#F3F4F8"
     var highlightedRowIndex = -1
@@ -55,21 +53,21 @@ class Table @JvmOverloads constructor(
     private var popupWindow: PopupWindow? = null
     private lateinit var popupWindowKeyBoard: PopupWindow
     private var isKeyboardShowing = false
-    private var testString: String? = null
     var rowIndex: Int? = 0
     var columnIndex: Int? = 0
-    object ShareText {
+    object globalVariable {
         var text: String? = ""
         var title: String? = ""
-        var getRowTitle = mutableListOf<String>()
+        var getColumnTitle = mutableListOf<String>()
+        var getColumnType = mutableListOf<String>()
         var tableColumnValue = mutableListOf<String>()
-        var getRowType = mutableListOf<String>()
-        var dataObjects = mutableListOf<MyDataList>()
+        var rowArray = mutableListOf<RowsModel>()
         var tableColumnOrderArrayID = mutableListOf<String>()
-        var tableColumns_Array : JSONArray = JSONArray()
+        var tableColumnsArray : JSONArray = JSONArray()
     }
 
-    val dataArray = ShareText.dataObjects
+    val rowsArray = globalVariable.rowArray
+
 
     init {
         removeDummyRow()
@@ -92,7 +90,7 @@ class Table @JvmOverloads constructor(
         }
         tableTitle.ellipsize = TextUtils.TruncateAt.END
         tableTitle.setSingleLine(true)
-        tableTitle.text = ShareText.title
+        tableTitle.text = globalVariable.title
         tableTitle.setTextColor(Color.parseColor("#3F404D"))
         tableTitle.textSize = 14f
         tableTitle.gravity = RelativeLayout.CENTER_VERTICAL
@@ -100,7 +98,7 @@ class Table @JvmOverloads constructor(
 
         moreLayout.visibility = View.GONE
         moreLayout.setPadding(40,15,30,15)
-        moreLayout.background = buttonBackground()
+        moreLayout.background = addRowButtonBackground()
         moreLayout.layoutParams = RelativeLayout.LayoutParams(
             dpToPx(context, 78),
             RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -113,7 +111,7 @@ class Table @JvmOverloads constructor(
         moreLayout.gravity = LinearLayout.TEXT_ALIGNMENT_VIEW_END
 
         moreLayout.setOnClickListener {
-            showDropdown(moreLayout, context)
+            moreButtonOptions(moreLayout, context)
         }
 
         val moreText = TextView(context)
@@ -133,7 +131,7 @@ class Table @JvmOverloads constructor(
         }
 
         addRowLayout.setPadding(40,15,30,15)
-        addRowLayout.background = buttonBackground()
+        addRowLayout.background = addRowButtonBackground()
         addRowLayout.layoutParams = RelativeLayout.LayoutParams(
             dpToPx(context, 100),
             RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -151,9 +149,9 @@ class Table @JvmOverloads constructor(
         addRowText.setTextColor(Color.parseColor(textColor))
         addRowText.textSize = 14f
 
-        val PlusImage = ImageView(context)
-        PlusImage.setImageResource(R.drawable.ic_add_round)
-        PlusImage.layoutParams = LinearLayout.LayoutParams(
+        val plusImage = ImageView(context)
+        plusImage.setImageResource(R.drawable.ic_add_round)
+        plusImage.layoutParams = LinearLayout.LayoutParams(
             dpToPx(context,20),
             dpToPx(context,20),
             1f
@@ -170,7 +168,6 @@ class Table @JvmOverloads constructor(
             addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
             addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
         }
-        
         //Mark:- Function for close table
         closeImage.setOnClickListener {
             val activity = context as Activity
@@ -179,7 +176,7 @@ class Table @JvmOverloads constructor(
         moreLayout.addView(moreText)
         moreLayout.addView(downArrowImage)
         addRowLayout.addView(addRowText)
-        addRowLayout.addView(PlusImage)
+        addRowLayout.addView(plusImage)
 
         relativeLayout.addView(tableTitle)
         relativeLayout.addView(moreLayout)
@@ -204,28 +201,28 @@ class Table @JvmOverloads constructor(
             TableRow.LayoutParams.WRAP_CONTENT
         )
         headRow.setBackgroundColor(Color.parseColor(headRowBackgroundColor))
-        setTopRowBackground(headRow)
+        setHeaderBackground(headRow)
 
-        val blankHeadCell = TextView(context)
-        blankHeadCell.background = topLeftCellBackground()
-        blankHeadCell.layoutParams = TableRow.LayoutParams(
-            width50dp, TableRow.LayoutParams.MATCH_PARENT
+        val selectionButtonCell = TextView(context)
+        selectionButtonCell.background = setTableTopLeftCornerRadius()
+        selectionButtonCell.layoutParams = TableRow.LayoutParams(
+            dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT
         )
-        blankHeadCell.setPadding(dpToPx(context,5), dpToPx(context,0), dpToPx(context,5),dpToPx(context,5))
-        blankHeadCell.gravity = android.view.Gravity.CENTER
-        headRow.addView(blankHeadCell)
+        selectionButtonCell.setPadding(dpToPx(context,5), dpToPx(context,0), dpToPx(context,5),dpToPx(context,5))
+        selectionButtonCell.gravity = android.view.Gravity.CENTER
+        headRow.addView(selectionButtonCell)
 
-        val hashCell = TextView(context)
-        hashCell.background = getCellBackground()
-        hashCell.layoutParams = TableRow.LayoutParams(
-            width50dp, TableRow.LayoutParams.MATCH_PARENT
+        val numberCell = TextView(context)
+        numberCell.background = getCellBackground()
+        numberCell.layoutParams = TableRow.LayoutParams(
+            dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT
         )
-        hashCell.gravity = android.view.Gravity.CENTER
-        hashCell.text ="#"
-        hashCell.setTextColor(Color.parseColor(textColor))
-        headRow.addView(hashCell)
+        numberCell.gravity = android.view.Gravity.CENTER
+        numberCell.text ="#"
+        numberCell.setTextColor(Color.parseColor(textColor))
+        headRow.addView(numberCell)
 
-        createDynamicHeadRow(tableLayout, ShareText.getRowTitle, headRow)
+        tableViewHeader(tableLayout, globalVariable.getColumnTitle, headRow)
 
         val horizontalScrollView = HorizontalScrollView(context)
         horizontalScrollView.layoutParams = LinearLayout.LayoutParams(
@@ -248,7 +245,7 @@ class Table @JvmOverloads constructor(
 
         scrollView.isVerticalScrollBarEnabled = false
         scrollView.isHorizontalScrollBarEnabled = false
-        dataArray.forEachIndexed { index, dataRow ->
+        rowsArray.forEachIndexed { index, dataRow ->
                 addNewIndex = index + 1
                 val newIndex = index + 1
                 val tableRow = TableRow(context)
@@ -257,10 +254,10 @@ class Table @JvmOverloads constructor(
                     TableRow.LayoutParams.WRAP_CONTENT,
                     TableRow.LayoutParams.WRAP_CONTENT
                 )
-                tableRow.background = getRowBackground()
+                tableRow.background = setRowBackground()
 
                 val linearLayout = LinearLayout(context)
-                linearLayout.layoutParams = TableRow.LayoutParams(width50dp, TableRow.LayoutParams.MATCH_PARENT)
+                linearLayout.layoutParams = TableRow.LayoutParams(dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT)
                 linearLayout.gravity = Gravity.CENTER_HORIZONTAL
                 linearLayout.background = getCellBackground()
                 val imageView = ImageView(context)
@@ -274,7 +271,7 @@ class Table @JvmOverloads constructor(
 
                 val hashLinearLayout = LinearLayout(context)
                 hashLinearLayout.layoutParams =
-                    TableRow.LayoutParams(width50dp, TableRow.LayoutParams.MATCH_PARENT)
+                    TableRow.LayoutParams(dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT)
                 hashLinearLayout.gravity = Gravity.CENTER_HORIZONTAL
                 hashLinearLayout.background = getCellBackground()
 
@@ -290,25 +287,25 @@ class Table @JvmOverloads constructor(
                 hashLinearLayout.addView(hash_Id)
                 tableRow.addView(hashLinearLayout)
 
-                insertDynamicDataWithTextDropDownColumn(index, tableRow, newIndex)
+                insertCellsValues(index, tableRow, newIndex)
 
                 addRowLayout.setOnClickListener {
-                  AddNewRow(scrollView)
+                    addRowButton(scrollView)
                 }
 
-                if (index == dataArray.size-1 ) {
-                    tableRow.background = createRoundedBackgroundForLastRow(30f)
-                    linearLayout.background = lastRowLeftBottom()
+                if (index == rowsArray.size - 1 ) {
+                    tableRow.background = cornerRadiusForLastRow(30f)
+                    linearLayout.background = lastRowLeftBottomCornerRadius()
                 } else {
-                    tableRow.background = getRowBackground()
+                    tableRow.background = setRowBackground()
                 }
 
                 tableLayout.addView(tableRow)
 
                 linearLayout.setOnClickListener {
-                highlightRow(tableRow, newIndex, tableLayout, moreLayout, imageView)
-                onRowClicked(tableRow, imageView)
-                setTopRowBackground(headRow)
+                selectedRow(tableRow, newIndex, tableLayout, moreLayout, imageView)
+                onRowSelectionButtonClick(tableRow, imageView)
+                setHeaderBackground(headRow)
                 }
         }
         horizontalScrollView.addView(tableLayout)
@@ -320,16 +317,16 @@ class Table @JvmOverloads constructor(
     //Mark: Function for Remove Dummy Row
     private fun removeDummyRow() {
         val idsToRemove = setOf("newRowId")
-        dataArray.removeIf { it.id in idsToRemove }
+        rowsArray.removeIf { it.id in idsToRemove }
     }
 
     //Mark: Create rows and update data into cells of rows
-    fun insertDynamicDataWithTextDropDownColumn(index: Int, tableRow: TableRow, newIndex: Int) {
-        for (i in ShareText.getRowType.indices) {
-            val type = ShareText.getRowType[i]
+    fun insertCellsValues(index: Int, tableRow: TableRow, newIndex: Int) {
+        for (i in globalVariable.getColumnType.indices) {
+            val type = globalVariable.getColumnType[i]
             val columnOrderIndex = i
             val rowOrderIndex = index
-            val columnId = ShareText.tableColumnOrderArrayID[columnOrderIndex]
+            val columnId = globalVariable.tableColumnOrderArrayID[columnOrderIndex]
             when (type) {
                 "text" -> {
                     val textColumnLayout = LinearLayout(context)
@@ -354,14 +351,14 @@ class Table @JvmOverloads constructor(
                     textColumnView.setTextColor(Color.parseColor(textColor))
                     textColumnView.setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus) {
-                            highlightCell(textColumnLayout, tableRow, tableLayout, newIndex)
+                            selectedCell(textColumnLayout, tableRow, tableLayout, newIndex)
                         }
                     }
 
-                    if (index == 2  && columnOrderIndex == Table.ShareText.getRowType.size - 1) {
-                        textColumnLayout.background = lastRowRightBottom()
+                    if (index == 2  && columnOrderIndex == globalVariable.getColumnType.size - 1) {
+                        textColumnLayout.background = lastRowRightBottomCornerRadius()
                     }
-                    val cellValues = ShareText.dataObjects[rowOrderIndex].cells
+                    val cellValues = globalVariable.rowArray[rowOrderIndex].cells
                     val value =cellValues[columnOrderIndex]
                     textColumnView.setText(""+value)
                     textColumnLayout.addView(textColumnView)
@@ -386,10 +383,10 @@ class Table @JvmOverloads constructor(
                     dropDownText.layoutParams = dropDownTextLayoutParams
                     dropDownTextLayoutParams.setMargins(0, dpToPx(context, 10), 0, 0)
                     dropDownText.setTextColor(Color.parseColor(textColor))
-                    val cellValues = Table.ShareText.dataObjects[rowOrderIndex].cells
+                    val cellValues = globalVariable.rowArray[rowOrderIndex].cells
 
-                    for (i in 0 until Table.ShareText.tableColumns_Array.length()) {
-                        val option = Table.ShareText.tableColumns_Array.getJSONObject(i)
+                    for (i in 0 until globalVariable.tableColumnsArray.length()) {
+                        val option = globalVariable.tableColumnsArray.getJSONObject(i)
                         if (option.getString("_id") == columnId) {
                             options = option.getJSONArray("options")
                         }
@@ -413,17 +410,19 @@ class Table @JvmOverloads constructor(
                     downArrowLayoutParams.setMargins(0, dpToPx(context, 10), 0, 0)
                     downArrow.setImageResource(R.drawable.ic_expand_down)
                     downArrow.setPadding(dpToPx(context, 5), 0, 0, 0)
-                    if (index == 2 && columnOrderIndex == Table.ShareText.getRowType.size - 1) {
-                        dropDownColumnLayout.background = lastRowRightBottom()
+
+                    if (index == 2 && columnOrderIndex == Table.globalVariable.getColumnType.size - 1) {
+                        dropDownColumnLayout.background = lastRowRightBottomCornerRadius()
                     }
 
                     dropDownColumnLayout.setOnClickListener {
                         var indexValue: Pair<Int, Int>? = null
-                        indexValue = getColumnIndex(tableLayout, dropDownColumnLayout)
+                        indexValue = findColumnIndex(tableLayout, dropDownColumnLayout)
                         rowIndex = indexValue?.first
                         columnIndex = indexValue?.second
+
                         if (rowIndex != null && columnIndex != null) {
-                            createRecyclerView(context, options)
+                            dropDownOptionsBottomSheet(context, options)
                         }
                     }
 
@@ -435,18 +434,18 @@ class Table @JvmOverloads constructor(
         }
     }
 
-    //Mark:- Function for Add New Row and perform on Add Row
-    private fun AddNewRow(scrollView: ScrollView) {
-        val newRow = MyDataList(id = "ID", deleted = false, cells = ShareText.tableColumnValue)
-        dataArray.add(newRow)
-        updateTableLayout(tableLayout, dataArray)
+    //Mark:- Function for Add New Row and perform on Add Row Button
+    private fun addRowButton(scrollView: ScrollView) {
+        val newRow = RowsModel(id = "ID", deleted = false, cells = globalVariable.tableColumnValue)
+        rowsArray.add(newRow)
+        updateTableLayout(tableLayout, rowsArray)
         scrollView.post {
             scrollView.fullScroll(View.FOCUS_DOWN)
         }
     }
 
     //Mark:- Mark:- Function for finding row index and column index of the table
-    fun getColumnIndex(tableLayout: TableLayout, cell: View): Pair<Int, Int>? {
+    fun findColumnIndex(tableLayout: TableLayout, cell: View): Pair<Int, Int>? {
         val rowCount = tableLayout.childCount
         for (rowIndex in 0 until rowCount) {
             val row = tableLayout.getChildAt(rowIndex) as TableRow
@@ -462,14 +461,14 @@ class Table @JvmOverloads constructor(
     }
 
     //Mark:- Function for update dropDown Text value
-        fun updateCellText(tableLayout: TableLayout, rowIndex: Int, columnIndex: Int) {
+        fun updateDropDownCellText(tableLayout: TableLayout, rowIndex: Int, columnIndex: Int) {
         val row = tableLayout.getChildAt(rowIndex) as TableRow
         if (columnIndex >= 0 && columnIndex < row.childCount) {
             val linearLayout = row.getChildAt(columnIndex) as LinearLayout
             if (linearLayout.childCount > 0) {
                 val cell = linearLayout.getChildAt(0) as TextView
                 if (cell != null){
-                    cell.text = ShareText.text
+                    cell.text = globalVariable.text
                 }
             }
         }
@@ -477,7 +476,7 @@ class Table @JvmOverloads constructor(
 
 
     //Mark: Function for showing Bottom Sheet with multiple options
-    fun createRecyclerView(context: Context, option: JSONArray?): LinearLayout {
+    fun dropDownOptionsBottomSheet(context: Context, option: JSONArray?): LinearLayout {
 
         val linearLayout = LinearLayout(context)
         linearLayout.orientation = LinearLayout.VERTICAL
@@ -519,9 +518,8 @@ class Table @JvmOverloads constructor(
             override fun onItemClick(view: View, position: Int) {
                 val newText = list.get(position).checkBox
                 adapter.notifyDataSetChanged()
-                testString = newText
-                ShareText.text = newText
-                updateCellText(tableLayout, rowIndex!!, columnIndex!! )
+                globalVariable.text = newText
+                updateDropDownCellText(tableLayout, rowIndex!!, columnIndex!! )
                 bottomSheetDialog.dismiss()
             }
         }))
@@ -533,7 +531,7 @@ class Table @JvmOverloads constructor(
     }
 
 
-    private fun onRowClicked(row: TableRow, imageView: ImageView) {
+    private fun onRowSelectionButtonClick(row: TableRow, imageView: ImageView) {
         if (row == selectedRow) {
             selectedRow = null
             imageView.setImageResource(R.drawable.ic_uncheck_circle_img) // Set the default image
@@ -555,7 +553,7 @@ class Table @JvmOverloads constructor(
         super.onDraw(canvas)
     }
 
-    private fun highlightCell(selectedCell: View, tableRow: TableRow, tableLayout: TableLayout,rowIndex: Int) {
+    private fun selectedCell(selectedCell: View, tableRow: TableRow, tableLayout: TableLayout,rowIndex: Int) {
         val selectedCellRowIndex = tableRow.indexOfChild(selectedCell)
         selectedRowCell = selectedCellRowIndex
         val clickedRow = tableLayout.getChildAt(rowIndex) as TableRow
@@ -567,9 +565,9 @@ class Table @JvmOverloads constructor(
                     tableLayout.getChildAt(selectedRowIndex)?.clearFocus()
                     selectedRowIndex = -1
                     cell.requestFocus()
-                    cell.background = getSelectedCellBackground()
+                    cell.background = selectedCellBackground()
                 }
-                cell.background = getSelectedCellBackground()
+                cell.background = selectedCellBackground()
             } else {
                 cell.background = getCellBackground()
             }
@@ -586,11 +584,7 @@ class Table @JvmOverloads constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    fun customTypeFace(fontWeight: Int): Typeface{
-        val typeface = Typeface.create(null, fontWeight, false)
-        return typeface
-    }
+
     //Mark: Cell Background
     fun getCellBackground(): GradientDrawable{
         val drawable = GradientDrawable()
@@ -598,14 +592,14 @@ class Table @JvmOverloads constructor(
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-    fun topLeftCellBackground(): GradientDrawable{
+    fun setTableTopLeftCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(30f, 30f, 0f, 0f, 0f, 0f, 0f, 0f)
         drawable.setStroke(2, Color.parseColor("#E6E7EA"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-    fun topRightCellBackground(): GradientDrawable{
+    fun setTableTopRightCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(0f, 0f, 30f, 30f, 0f, 0f, 0f, 0f)
         drawable.setStroke(2, Color.parseColor("#E6E7EA"))
@@ -618,27 +612,27 @@ class Table @JvmOverloads constructor(
         return editDrawable
     }
 
-    fun getRowBackground(): GradientDrawable{
+    fun setRowBackground(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(2 , Color.parseColor("#E2E3E7"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-    fun getNewRowBackground(): GradientDrawable{
+    fun selectedRowBackground(): GradientDrawable{
         val drawable = GradientDrawable()
-        drawable.setStroke(6 , Color.parseColor("#1F6BFF"))
+        drawable.setStroke(4 , Color.parseColor("#1F6BFF"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
 
-    fun getSelectedCellBackground(): GradientDrawable{
+    fun selectedCellBackground(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(2 , Color.parseColor("#1F6BFF"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
 
-    fun buttonBackground(): GradientDrawable{
+    fun addRowButtonBackground(): GradientDrawable{
         val buttonDrawable = GradientDrawable()
         buttonDrawable.setColor(Color.WHITE)
         buttonDrawable.shape = GradientDrawable.RECTANGLE
@@ -647,7 +641,7 @@ class Table @JvmOverloads constructor(
         return buttonDrawable
     }
 
-    private fun setTopRowBackground(view: TableRow) {
+    private fun setHeaderBackground(view: TableRow) {
         val drawable = GradientDrawable()
         drawable.setColor(Color.parseColor(headRowBackgroundColor))
         drawable.cornerRadii = floatArrayOf(
@@ -659,21 +653,20 @@ class Table @JvmOverloads constructor(
     }
 
 
-    fun createRoundedBackgroundForLastRow(radius: Float): GradientDrawable {
+    fun cornerRadiusForLastRow(radius: Float): GradientDrawable {
         val gradientDrawable = GradientDrawable()
         gradientDrawable.setStroke(2, Color.parseColor("#E2E3E7"))
-        // Set the radius for each corner (bottom-left and bottom-right)
         gradientDrawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, radius, radius, radius, radius)
         return gradientDrawable
     }
 
-    fun  lastRowRightBottom(): GradientDrawable{
+    fun  lastRowRightBottomCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 30f, 30f, 0f, 0f)
         return drawable
     }
 
-    fun  lastRowLeftBottom(): GradientDrawable{
+    fun  lastRowLeftBottomCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 30f, 30f)
         return drawable
@@ -681,16 +674,16 @@ class Table @JvmOverloads constructor(
 
 
    //Mark: Function for Select row
-    fun highlightRow(selectedRow: TableRow, rowIndex: Int, tableLayout: TableLayout, moreLayout: LinearLayout, imageView: ImageView) {
+    fun selectedRow(selectedRow: TableRow, rowIndex: Int, tableLayout: TableLayout, moreLayout: LinearLayout, imageView: ImageView) {
        if (highlightedRowIndex != rowIndex) {
            if (highlightedRowIndex >= 0 && highlightedRowIndex < tableLayout.childCount) {
                val previousRow = tableLayout.getChildAt(highlightedRowIndex) as TableRow
-               previousRow.background = getRowBackground()
+               previousRow.background = setRowBackground()
            }
 
            if (rowIndex >= 0 && rowIndex < tableLayout.childCount) {
                val clickedRow = tableLayout.getChildAt(rowIndex) as TableRow
-               clickedRow.background = getNewRowBackground()
+               clickedRow.background = selectedRowBackground()
                highlightedRowIndex = rowIndex
                moreLayout.visibility = View.VISIBLE
            } else {
@@ -699,14 +692,14 @@ class Table @JvmOverloads constructor(
            }
        } else {
            val clickedRow = tableLayout.getChildAt(rowIndex) as TableRow
-           clickedRow.background = getRowBackground()
+           clickedRow.background = setRowBackground()
            highlightedRowIndex = -1
            moreLayout.visibility = View.GONE
        }
     }
 
     //Mark:- Action for more button to open DropDown
-    fun moreOption(context: Context, popUpShow: Boolean): LinearLayout{
+    fun dropDownView(context: Context, popUpShow: Boolean): LinearLayout{
         val backgroundColor ="#E9EAEF"
         val deleteTextColor ="#FB4534"
         val linearLayout = createLinearLayout()
@@ -718,42 +711,42 @@ class Table @JvmOverloads constructor(
         )
         linearLayout.setPadding(10, 10, 10, 10)
 
-        val insertRow = createTextView("Insert Below", textColor)
-        val view1 = createSeparatorView(backgroundColor)
+        val insertRow = label("Insert Below", textColor)
+        val view1 = view(backgroundColor)
 
-        val duplicateRow = createTextView("Duplicate", textColor)
-        val view2 = createSeparatorView(backgroundColor)
+        val duplicateRow = label("Duplicate", textColor)
+        val view2 = view(backgroundColor)
 
-        val moveRowUP = createTextView("Move Up", textColor)
-        val view3 = createSeparatorView(backgroundColor)
+        val moveRowUP = label("Move Up", textColor)
+        val view3 = view(backgroundColor)
 
-        val moveRowDown = createTextView("Move Down", textColor)
-        val view4 = createSeparatorView(backgroundColor)
+        val moveRowDown = label("Move Down", textColor)
+        val view4 = view(backgroundColor)
 
-        val deleteRow = createTextView("Delete", deleteTextColor)
+        val deleteRow = label("Delete", deleteTextColor)
 
 
         insertRow.setOnClickListener{
             moreLayout.visibility = View.GONE
             popupWindow!!.dismiss()
             val indexToAddBelow = highlightedRowIndex-1
-            val newRow = MyDataList(id = "ID", deleted = false, cells = ShareText.tableColumnValue)
-            addRowBelowIndex(indexToAddBelow, newRow)
+            val newRow = RowsModel(id = "ID", deleted = false, cells = globalVariable.tableColumnValue)
+            handleAddBelowRow(indexToAddBelow, newRow)
         }
 
         duplicateRow.setOnClickListener{
             moreLayout.visibility = View.GONE
             popupWindow!!.dismiss()
             val dataItemDuplicate = highlightedRowIndex-1
-            duplicateRowById(tableLayout, dataArray,dataItemDuplicate)
+            handleDuplicateRow(tableLayout, rowsArray,dataItemDuplicate)
         }
         moveRowUP.setOnClickListener{
-            moveUpRow()
+            handleMoveRowUp()
             moreLayout.visibility = View.GONE
             popupWindow!!.dismiss()
         }
         moveRowDown.setOnClickListener{
-            moveDownRow()
+            handleMoveRowDown()
             moreLayout.visibility = View.GONE
             popupWindow!!.dismiss()
         }
@@ -761,8 +754,8 @@ class Table @JvmOverloads constructor(
             moreLayout.visibility = View.GONE
             popupWindow!!.dismiss()
             val dataItemToDelete = highlightedRowIndex-1
-            removeRowByIndex(tableLayout, dataArray, dataItemToDelete)
-            updateTableLayout(tableLayout, dataArray)
+            handleDeleteRow(tableLayout, rowsArray, dataItemToDelete)
+            updateTableLayout(tableLayout, rowsArray)
         }
         linearLayout.addView(insertRow)
         linearLayout.addView(view1)
@@ -786,7 +779,7 @@ class Table @JvmOverloads constructor(
             currentCell.clearFocus()
             val rowAbove = tableLayout.getChildAt(selectedCellRowIndex ) as TableRow
             val cellAbove = rowAbove.getChildAt(2)
-            cellAbove.background = getSelectedCellBackground()
+            cellAbove.background = selectedCellBackground()
             cellAbove.requestFocus()
         }
     }
@@ -803,7 +796,7 @@ class Table @JvmOverloads constructor(
             currentCell.clearFocus()
             val rowAbove = tableLayout.getChildAt(selectedCellRowIndex ) as TableRow
             val cellAbove = rowAbove.getChildAt(3)
-            cellAbove.background = getSelectedCellBackground()
+            cellAbove.background = selectedCellBackground()
             cellAbove.requestFocus()
         }
     }
@@ -842,7 +835,7 @@ class Table @JvmOverloads constructor(
             currentCell.clearFocus()
             val rowAbove = tableLayout.getChildAt(selectedCellRowIndex - 1) as TableRow
             val cellAbove = rowAbove.getChildAt(selectedRowCell)
-            cellAbove.background = getSelectedCellBackground()
+            cellAbove.background = selectedCellBackground()
             moveFocusToNextEditText(editText)
             cellAbove.requestFocus()
         }
@@ -851,20 +844,20 @@ class Table @JvmOverloads constructor(
     //Mark: Navigation Down Move Tapped
     private fun moveCursorBottom() {
         var selectedCellRowIndex = selectedCellRowIndexOf
-        if (selectedCellRowIndex >= 1 && selectedCellRowIndex < dataArray.size-1) {
+        if (selectedCellRowIndex >= 1 && selectedCellRowIndex < rowsArray.size - 1) {
             val currentRow = tableLayout.getChildAt(selectedCellRowIndex) as TableRow
             val currentCell = currentRow.getChildAt(selectedRowCell)
             currentCell.background = getCellBackground()
             currentCell.clearFocus()
             val rowAbove = tableLayout.getChildAt(selectedCellRowIndex + 1) as TableRow
             val cellAbove = rowAbove.getChildAt(selectedRowCell)
-            cellAbove.background = getSelectedCellBackground()
+            cellAbove.background = selectedCellBackground()
             cellAbove.requestFocus()
         }
     }
 
     //Mark: Create Custom Buttons above Default Keyboard
-    fun createKeyboardKey(editText: EditText, tableRow: TableRow, tableLayout: TableLayout, linearLayout: LinearLayout):LinearLayout{
+    fun navigationKeys(editText: EditText, tableRow: TableRow, tableLayout: TableLayout, linearLayout: LinearLayout):LinearLayout{
         val linearLayout =  LinearLayout(context)
         linearLayout.layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         linearLayout.setBackgroundColor(Color.TRANSPARENT)
@@ -872,7 +865,7 @@ class Table @JvmOverloads constructor(
         linearLayout.gravity = Gravity.END
 
         val leftKeyLayout = LinearLayout(context)
-        leftKeyLayout.background = buttonBackground()
+        leftKeyLayout.background = addRowButtonBackground()
         leftKeyLayout.layoutParams = LayoutParams(dpToPx(context,50), dpToPx(context,40))
         leftKeyLayout.gravity = Gravity.CENTER
 
@@ -884,7 +877,7 @@ class Table @JvmOverloads constructor(
         leftKeyLayout.addView(leftKey)
 
         val rightKeyLayout = LinearLayout(context)
-        rightKeyLayout.background = buttonBackground()
+        rightKeyLayout.background = addRowButtonBackground()
         val layoutParams2 = LayoutParams(dpToPx(context,50), dpToPx(context,40))
         layoutParams2.setMargins(dpToPx(context,10),0,0,0)
         rightKeyLayout.layoutParams = layoutParams2
@@ -898,7 +891,7 @@ class Table @JvmOverloads constructor(
         rightKeyLayout.addView(rightKey)
 
         val topKeyLayout = LinearLayout(context)
-        topKeyLayout.background = buttonBackground()
+        topKeyLayout.background = addRowButtonBackground()
         val layoutParams3 = LayoutParams(dpToPx(context,50), dpToPx(context,40))
         layoutParams3.setMargins(dpToPx(context,10),0,0,0)
         topKeyLayout.layoutParams = layoutParams3
@@ -911,7 +904,7 @@ class Table @JvmOverloads constructor(
         topKeyLayout.addView(topKey)
 
         val downKeyLayout = LinearLayout(context)
-        downKeyLayout.background = buttonBackground()
+        downKeyLayout.background = addRowButtonBackground()
         val layoutParams4 = LayoutParams(dpToPx(context,50), dpToPx(context,40))
         layoutParams4.setMargins(dpToPx(context,10),0,dpToPx(context,10),0)
         downKeyLayout.layoutParams = layoutParams4
@@ -947,8 +940,8 @@ class Table @JvmOverloads constructor(
     }
 
     //Mark:- Function for showing custom keyboard
-    fun showKeyboardButtons(view: EditText, context: Context, tableRow: TableRow, tableLayout: TableLayout, linearLayout: LinearLayout) {
-        val customView = createKeyboardKey(view as EditText, tableRow, tableLayout, linearLayout)
+    fun showNavigationKeys(view: EditText, context: Context, tableRow: TableRow, tableLayout: TableLayout, linearLayout: LinearLayout) {
+        val customView = navigationKeys(view as EditText, tableRow, tableLayout, linearLayout)
         popupWindowKeyBoard = PopupWindow(
             customView,
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -997,8 +990,8 @@ class Table @JvmOverloads constructor(
         view.clearFocus()
     }
 
-    fun showDropdown(view: View, context: Context) {
-        val customView = moreOption(context, true)
+    fun moreButtonOptions(view: View, context: Context) {
+        val customView = dropDownView(context, true)
         popupWindow = PopupWindow(
             customView,
             dpToPx(context,230),
@@ -1014,7 +1007,7 @@ class Table @JvmOverloads constructor(
         popupWindow!!.showAsDropDown(view, xOffset, 0)
     }
 
-    private fun createTextView(text: String, textColor: String): TextView {
+    private fun label(text: String, textColor: String): TextView {
         val textView = TextView(context)
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1028,11 +1021,11 @@ class Table @JvmOverloads constructor(
         return textView
     }
 
-    private fun createSeparatorView(backgroundColor: String): View {
+    private fun view(backgroundColor: String): View {
         val separatorView = View(context)
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
-            1
+            dpToPx(context,1)
         )
         separatorView.setBackgroundColor(Color.parseColor(backgroundColor))
         separatorView.layoutParams = layoutParams
@@ -1052,59 +1045,58 @@ class Table @JvmOverloads constructor(
     }
 
     //Mark: Function for Delete Row
-    fun removeRowByIndex(tableLayout: TableLayout, dataArray: MutableList<MyDataList>,indexToRemove: Int) {
-        if (indexToRemove >= 0 && indexToRemove < dataArray.size) {
-            dataArray.removeAt(indexToRemove)
-            updateTableLayout(tableLayout, dataArray)
+    fun handleDeleteRow(tableLayout: TableLayout, rowsArray: MutableList<RowsModel>,indexToRemove: Int) {
+        if (indexToRemove >= 0 && indexToRemove < rowsArray.size) {
+            rowsArray.removeAt(indexToRemove)
+            updateTableLayout(tableLayout, rowsArray)
             highlightedRowIndex = 0
         }
     }
 
     //Mark: Function for Insert Row below to the selected row
-    fun addRowBelowIndex(indexToAddBelow: Int, newRow: MyDataList) {
-        if (indexToAddBelow >= 0 && indexToAddBelow < dataArray.size) {
-            dataArray.add(indexToAddBelow + 1, newRow)
-            updateTableLayout(tableLayout, dataArray)
+    fun handleAddBelowRow(indexToAddBelow: Int, newRow: RowsModel) {
+        if (indexToAddBelow >= 0 && indexToAddBelow < rowsArray.size) {
+            rowsArray.add(indexToAddBelow + 1, newRow)
+            updateTableLayout(tableLayout, rowsArray)
             highlightedRowIndex = 0
         }
     }
 
     //Mark: Function for move row up
-    fun moveUpRow(){
-        if ( highlightedRowIndex <= dataArray.size) {
-            swap(dataArray, highlightedRowIndex-1)
-            updateTableLayout(tableLayout, dataArray)
+    fun handleMoveRowUp(){
+        if ( highlightedRowIndex <= rowsArray.size) {
+            swapRowUp(rowsArray, highlightedRowIndex-1)
+            updateTableLayout(tableLayout, rowsArray)
             highlightedRowIndex = 0
         }
     }
-    fun swap(dataArray: MutableList<MyDataList>, selectedIndex: Int) {
-        if (selectedIndex <= dataArray.size) {
-            val selectedRow = dataArray[selectedIndex]
-            dataArray.removeAt(selectedIndex)
-            dataArray.add(selectedIndex - 1, selectedRow)
+    fun swapRowUp(rowsArray: MutableList<RowsModel>, selectedIndex: Int) {
+        if (selectedIndex <= rowsArray.size) {
+            val selectedRow = rowsArray[selectedIndex]
+            rowsArray.removeAt(selectedIndex)
+            rowsArray.add(selectedIndex - 1, selectedRow)
         } else { }
     }
 
     //Mark: Function for move row down
-    fun moveDownRow(){
-        if ( highlightedRowIndex < dataArray.size ) {
-            swapData(dataArray, highlightedRowIndex, highlightedRowIndex-1)
-            updateTableLayout(tableLayout, dataArray)
+    fun handleMoveRowDown(){
+        if ( highlightedRowIndex < rowsArray.size ) {
+            swapRowDown(rowsArray, highlightedRowIndex, highlightedRowIndex-1)
+            updateTableLayout(tableLayout, rowsArray)
             highlightedRowIndex = 0
         }
     }
 
     // Function for duplicate a selected row by its ID
-    fun duplicateRowById(tableLayout: TableLayout, dataArray: MutableList<MyDataList>, indexToDuplicate: Int) {
-        if (indexToDuplicate >= 0 && indexToDuplicate < dataArray.size) {
-            val selectedRow = dataArray[indexToDuplicate]
+    fun handleDuplicateRow(tableLayout: TableLayout, rowsArray: MutableList<RowsModel>, indexToDuplicate: Int) {
+        if (indexToDuplicate >= 0 && indexToDuplicate < rowsArray.size) {
+            val selectedRow = rowsArray[indexToDuplicate]
             val duplicatedRow = selectedRow.copy(id = "newId") // Change the ID if needed
-            dataArray.add(indexToDuplicate + 1, duplicatedRow)
-            updateTableLayout(tableLayout, dataArray)
+            rowsArray.add(indexToDuplicate + 1, duplicatedRow)
+            updateTableLayout(tableLayout, rowsArray)
             highlightedRowIndex = 0
         }
     }
-
 
     //Mark:- Keyboard Delegate function
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -1114,23 +1106,23 @@ class Table @JvmOverloads constructor(
     }
 
     //Mark:- function to update table after navigation performed
-    fun updateTableLayout(tableLayout: TableLayout, dataArray: MutableList<MyDataList>) {
+    fun updateTableLayout(tableLayout: TableLayout, rowsArray: MutableList<RowsModel>) {
         tableLayout.removeAllViews()
         headRow.setBackgroundColor(Color.parseColor(headRowBackgroundColor))
-        setTopRowBackground(headRow)
+        setHeaderBackground(headRow)
         tableLayout.addView(headRow)
 
-        dataArray.forEachIndexed { index, dataRow ->
+        rowsArray.forEachIndexed { index, dataRow ->
             val newIndex = index+1
             val tableRow = TableRow(context)
             tableRow.layoutParams = TableRow.LayoutParams(
                 TableRow.LayoutParams.WRAP_CONTENT,
                 TableRow.LayoutParams.WRAP_CONTENT
             )
-            tableRow.background = getRowBackground()
+            tableRow.background = setRowBackground()
 
             val linearLayout = LinearLayout(context)
-            linearLayout.layoutParams = TableRow.LayoutParams(width50dp, TableRow.LayoutParams.MATCH_PARENT)
+            linearLayout.layoutParams = TableRow.LayoutParams(dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT)
             linearLayout.gravity = Gravity.CENTER_HORIZONTAL
             linearLayout.background = getCellBackground()
 
@@ -1143,7 +1135,7 @@ class Table @JvmOverloads constructor(
             tableRow.addView(linearLayout)
 
             val hashLinearLayout = LinearLayout(context)
-            hashLinearLayout.layoutParams = TableRow.LayoutParams(width50dp, TableRow.LayoutParams.MATCH_PARENT)
+            hashLinearLayout.layoutParams = TableRow.LayoutParams(dpToPx(context,50), TableRow.LayoutParams.MATCH_PARENT)
             hashLinearLayout.gravity = Gravity.CENTER_HORIZONTAL
             hashLinearLayout.background = getCellBackground()
 
@@ -1155,29 +1147,29 @@ class Table @JvmOverloads constructor(
             hash_Id.setText(""+newIndex)
             hashLinearLayout.addView(hash_Id)
             tableRow.addView(hashLinearLayout)
-            insertDynamicDataWithTextDropDownColumn(index, tableRow, newIndex)
+            insertCellsValues(index, tableRow, newIndex)
 
-            if (index == dataArray.size-1 ) {
-                tableRow.background = createRoundedBackgroundForLastRow(30f)
-                linearLayout.background = lastRowLeftBottom()
+            if (index == rowsArray.size - 1 ) {
+                tableRow.background = cornerRadiusForLastRow(30f)
+                linearLayout.background = lastRowLeftBottomCornerRadius()
             } else {
-                tableRow.background = getRowBackground()
+                tableRow.background = setRowBackground()
             }
             tableLayout.addView(tableRow)
 
 
             linearLayout.setOnClickListener {
-                highlightRow(tableRow, newIndex, tableLayout, moreLayout, imageView)
-                onRowClicked(tableRow, imageView)
-                setTopRowBackground(headRow)
+                selectedRow(tableRow, newIndex, tableLayout, moreLayout, imageView)
+                onRowSelectionButtonClick(tableRow, imageView)
+                setHeaderBackground(headRow)
             }
         }
     }
 
-    fun createDynamicHeadRow(tableLayout: TableLayout, columnArray: MutableList<String>, headerRow: TableRow) {
-        val numColumns = columnArray.size
-        val lastIndex = columnArray.size - 1
-        for ((index, columnName) in columnArray.withIndex()) {
+    fun tableViewHeader(tableLayout: TableLayout, columnTitleArray: MutableList<String>, headerRow: TableRow) {
+        val numColumns = columnTitleArray.size
+        val lastIndex = columnTitleArray.size - 1
+        for ((index, columnName) in columnTitleArray.withIndex()) {
             val textView = TextView(tableLayout.context)
             val availableWidth = getScreenWidth(context) - 300
             textView.setTextColor(Color.parseColor(textColor))
@@ -1198,7 +1190,7 @@ class Table @JvmOverloads constructor(
             textView.text = columnName
             textView.background = getCellBackground()
             if (index == lastIndex) {
-                textView.background = topRightCellBackground()
+                textView.background = setTableTopRightCornerRadius()
             } else {
                 textView.background = getCellBackground()
             }
@@ -1210,12 +1202,11 @@ class Table @JvmOverloads constructor(
         tableLayout.addView(headerRow)
     }
 }
-
     //Mark: Function for Swap Rows
-    fun swapData(dataArray: MutableList<MyDataList>, position1: Int, position2: Int) {
-        if (position1 in 0 until dataArray.size && position2 in 0 until dataArray.size) {
-            Collections.swap(dataArray, position1, position2)
+    fun swapRowDown(rowsArray: MutableList<RowsModel>, position1: Int, position2: Int) {
+        if (position1 in 0 until rowsArray.size && position2 in 0 until rowsArray.size) {
+            Collections.swap(rowsArray, position1, position2)
         } else {
-            Collections.swap(dataArray, position1, position2)
+            Collections.swap(rowsArray, position1, position2)
         }
     }

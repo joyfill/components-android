@@ -23,9 +23,9 @@ import java.io.IOException
 @RequiresApi(Build.VERSION_CODES.P)
 class MobileSDKField(context: Context) : LinearLayout(context){
     val componentLayout = LinearLayout(context)
-    var yValues_mobile = ArrayList<Int>()
-    var component_type = ArrayList<String>()
-    var Sequence_With_Y_Position: List<String> = emptyList()
+    var yValuesMobile = ArrayList<Int>()
+    var getComponentType = ArrayList<String>()
+    var sequenceWithYPosition: List<String> = emptyList()
     var dataValues = ArrayList<String>()
     var tableColumnOrderArrayID = ArrayList<String>()
     val tableColumnType = mutableListOf<String>()
@@ -38,7 +38,7 @@ class MobileSDKField(context: Context) : LinearLayout(context){
     private val client = OkHttpClient()
     object SharedData {
         var joyfillDocID: String = ""
-        var authorizedToken: String = ""
+        var joyfillauthorizedToken: String = ""
     }
     val textField = TextField(context)
     val dropDown = DropDown(context)
@@ -88,15 +88,15 @@ class MobileSDKField(context: Context) : LinearLayout(context){
         scrollView.addView(componentLayout)
         view.addView(scrollView)
         addView(view)
-        makeApiCall()
+        retrieveJoyfillData()
     }
 
-    //Mark: Function for API Call
-    fun makeApiCall() {
+    //Mark: Function for retrieve joy fill data from API
+    fun retrieveJoyfillData() {
         val url = "https://api-joy.joyfill.io/v1/documents/"+ SharedData.joyfillDocID
         val request = Request.Builder()
             .url(url)
-            .addHeader("Authorization", SharedData.authorizedToken)
+            .addHeader("Authorization", SharedData.joyfillauthorizedToken)
             .addHeader("Content-Type", "application/json")
             .build()
 
@@ -115,45 +115,45 @@ class MobileSDKField(context: Context) : LinearLayout(context){
                     if (views.length()>0){
                         // For Mobile View
                         for (j in 0 until views.length()){
-                            val view_pages = views.getJSONObject(j).getJSONArray("pages")
-                            for (k in 0 until view_pages.length()){
-                                val fieldPositions =view_pages.getJSONObject(k).getJSONArray("fieldPositions")
+                            val viewPages = views.getJSONObject(j).getJSONArray("pages")
+                            for (k in 0 until viewPages.length()){
+                                val fieldPositions = viewPages.getJSONObject(k).getJSONArray("fieldPositions")
                                 for (l in 0 until fieldPositions.length()){
-                                    val component_Type = fieldPositions.getJSONObject(l).get("type")
-                                    val Y_Position =  fieldPositions.getJSONObject(l).getDouble("y")
-                                    yValues_mobile.add(Y_Position.toInt())
-                                    component_type.add(component_Type.toString())
-                                    val componentTypePairedArray = yValues_mobile.zip(component_type)
-                                    val sorted_type = componentTypePairedArray.sortedBy { it.first }
-                                    val sortedType_value = valueForSortedType(sorted_type.toString())
-                                    Sequence_With_Y_Position = sortedType_value
+                                    val componentType = fieldPositions.getJSONObject(l).get("type")
+                                    val yPosition =  fieldPositions.getJSONObject(l).getDouble("y")
+                                    yValuesMobile.add(yPosition.toInt())
+                                    getComponentType.add(componentType.toString())
+                                    val componentTypePairedArray = yValuesMobile.zip(getComponentType)
+                                    val sortedType = componentTypePairedArray.sortedBy { it.first }
+                                    val sortedTypeValue = fetchSortedComponentType(sortedType.toString())
+                                    sequenceWithYPosition = sortedTypeValue
                                 }
-                                formatBlockData(fieldPositions)
+                                updateBlockFieldValues(fieldPositions)
                             }
-                            ShowComponents(Sequence_With_Y_Position, fields)
+                            joyFillComponents(sequenceWithYPosition, fields)
                         }
-                    }else {
+                    } else {
                         // For Primary View or Web View
                         for (j in 0 until pages.length()) {
                             val fieldPositions = pages.getJSONObject(j).getJSONArray("fieldPositions")
                             for (k in 0 until fieldPositions.length()) {
-                                val component_Type = fieldPositions.getJSONObject(k).get("type")
-                                val Y_Position =  fieldPositions.getJSONObject(k).getDouble("y")
-                                yValues_mobile.add(Y_Position.toInt())
-                                component_type.add(component_Type.toString())
-                                val componentTypePairedArray = yValues_mobile.zip(component_type)
-                                val sorted_type = componentTypePairedArray.sortedBy { it.first }
-                                val sortedType_value = valueForSortedType(sorted_type.toString())
-                                Sequence_With_Y_Position = sortedType_value
-                                dataValues.addAll(valueForSortedType(sorted_type.toString()))
+                                val componentType = fieldPositions.getJSONObject(k).get("type")
+                                val yPosition =  fieldPositions.getJSONObject(k).getDouble("y")
+                                yValuesMobile.add(yPosition.toInt())
+                                getComponentType.add(componentType.toString())
+                                val componentTypePairedArray = yValuesMobile.zip(getComponentType)
+                                val sortedType = componentTypePairedArray.sortedBy { it.first }
+                                val sortedTypeValue = fetchSortedComponentType(sortedType.toString())
+                                sequenceWithYPosition = sortedTypeValue
+                                dataValues.addAll(fetchSortedComponentType(sortedType.toString()))
                             }
-                            formatBlockData(fieldPositions)
+                            updateBlockFieldValues(fieldPositions)
 
                         }
-                        ShowComponents(Sequence_With_Y_Position, fields)
+                        joyFillComponents(sequenceWithYPosition, fields)
                     }
                 }
-                updateVaue(fields)
+                updateDropDownAndMultiSelectOptions(fields)
                 getTableData(fields)
             }
 
@@ -180,65 +180,63 @@ class MobileSDKField(context: Context) : LinearLayout(context){
 
                 val tableColumnID =  fields.getJSONObject(i).getJSONArray("tableColumns")
                 for (i in 0 until tableColumnID.length()) {
-                    val columnId = tableColumnID.getJSONObject(i).optString("_id")
-                    idPositionsMap[columnId] = i
+                    val getTableColumnsID = tableColumnID.getJSONObject(i).optString("_id")
+                    idPositionsMap[getTableColumnsID] = i
                 }
 
                 for (j in 0 until tableColumnOrderArrayID.size){
-                    val idFromShortedData = tableColumnOrderArrayID[j]
-                    if (idPositionsMap.containsKey(idFromShortedData)) {
-                        val positionInFields = idPositionsMap[idFromShortedData]!!
-                        val haveID = tableColumnID.getJSONObject(positionInFields)
-                        val columnType = haveID.optString("type")
-                        val columnTitle = haveID.optString("title")
-                        val columnValue = haveID.optString("value")
+                    val getTableColumnOrderId = tableColumnOrderArrayID[j]
+
+                    if (idPositionsMap.containsKey(getTableColumnOrderId)) {
+                        val positionInFields = idPositionsMap[getTableColumnOrderId]!!
+                        val getRowData = tableColumnID.getJSONObject(positionInFields)
+
+                        val columnType = getRowData.optString("type")
+                        val columnTitle = getRowData.optString("title")
+                        val columnValue = getRowData.optString("value")
+
                         tableColumnValue.add(columnValue)
                         tableColumnType.add(columnType)
                         tableColumnTitle.add(columnTitle)
                     }
                 }
 
-                // for number of rows
-                var dataArray = mutableListOf<String>()
-                for (m in 0 until rowOrderArray.length()){
-                    val row_id = rowOrderArray.get(m)
-                    dataArray.add(row_id.toString())
-                }
+                val rowCellsArray = mutableListOf<RowsModel>()
 
-                val dataObjects = mutableListOf<MyDataList>()
-
-                val filteredArray = filterDeletedObjects(valueArray)
+                val filteredArray = filterDeletedRows(valueArray)
                 for (i in 0 until filteredArray.length()) {
                     val jsonObject = filteredArray.getJSONObject(i)
-                    val cellsObject = jsonObject.getJSONObject("cells")
+                    val cells = jsonObject.getJSONObject("cells")
                     val cellValues = tableColumnOrderArrayID.map { key ->
-                        cellsObject.optString(key.toString(), "")
+                        cells.optString(key.toString(), "")
                     }
-                    val myData = MyDataList(
+
+                    val rowCells = RowsModel(
                         id = jsonObject.optString("_id", ""),
                         deleted = jsonObject.optBoolean("deleted", false),
                         cells = cellValues
                     )
-                    dataObjects.add(myData)
+                    rowCellsArray.add(rowCells)
                 }
 
-                Table.ShareText.tableColumns_Array = tableColumnsArray
-                Table.ShareText.dataObjects = dataObjects
-                TableField.TableFieldObj.RowArray = dataObjects
-                Table.ShareText.getRowTitle = tableColumnTitle
-                Table.ShareText.getRowType = tableColumnType
-                Table.ShareText.tableColumnValue = tableColumnValue
-                Table.ShareText.tableColumnOrderArrayID = tableColumnOrderArrayID
+
+                Table.globalVariable.tableColumnsArray = tableColumnsArray
+                Table.globalVariable.rowArray = rowCellsArray
+                TableField.variable.rowArray = rowCellsArray
+                Table.globalVariable.getColumnTitle = tableColumnTitle
+                Table.globalVariable.getColumnType = tableColumnType
+                Table.globalVariable.tableColumnValue = tableColumnValue
+                Table.globalVariable.tableColumnOrderArrayID = tableColumnOrderArrayID
             }
         }
 
     }
 
     //Mark:- Showing rows if deleted false
-    fun filterDeletedObjects(dataArray: JSONArray): JSONArray {
+    fun filterDeletedRows(rows: JSONArray): JSONArray {
         val filteredArray = JSONArray()
-        for (i in 0 until dataArray.length()) {
-            val jsonObject = dataArray.getJSONObject(i)
+        for (i in 0 until rows.length()) {
+            val jsonObject = rows.getJSONObject(i)
             val isDeleted = jsonObject.optBoolean("deleted", false)
             if (isDeleted == false) {
                 filteredArray.put(jsonObject)
@@ -248,7 +246,7 @@ class MobileSDKField(context: Context) : LinearLayout(context){
         return filteredArray
     }
 
-    private fun updateVaue(fields: JSONArray) {
+    private fun updateDropDownAndMultiSelectOptions(fields: JSONArray) {
         for (i in 0 until fields.length()){
             val type = fields.getJSONObject(i).get("type")
             val id = fields.getJSONObject(i).get("_id")
@@ -267,7 +265,7 @@ class MobileSDKField(context: Context) : LinearLayout(context){
         }
     }
 
-    private fun formatBlockData(fieldPositions: JSONArray) {
+    private fun updateBlockFieldValues(fieldPositions: JSONArray) {
         for (i in 0 until fieldPositions.length()){
             val type = fieldPositions.getJSONObject(i).get("type")
             if (type == "block"){
@@ -288,66 +286,66 @@ class MobileSDKField(context: Context) : LinearLayout(context){
     }
 
 
-    private fun ShowComponents(shorteddatawithYPosition: List<String>, fields: JSONArray) {
+    private fun joyFillComponents(shortedDataWithYPosition: List<String>, fields: JSONArray) {
         for (i in 0 until fields.length()) {
             val type = fields.getJSONObject(i).optString("type")
             typePositionsMap[type] = i
         }
 
-        for (j in 0 until shorteddatawithYPosition.size) {
-            val typeFromShortedData = shorteddatawithYPosition[j]
+        for (j in 0 until shortedDataWithYPosition.size) {
+            val getSortedYPosition = shortedDataWithYPosition[j]
 
-            if (typePositionsMap.containsKey(typeFromShortedData)) {
-                val positionInFields = typePositionsMap[typeFromShortedData]!!
+            if (typePositionsMap.containsKey(getSortedYPosition)) {
+                val getSortedTypeWithYPosition = typePositionsMap[getSortedYPosition]!!
 
-                val haveValues = fields.getJSONObject(positionInFields)
-                val type = haveValues.optString("type")
-                var value: String? =  haveValues.optString("value")
-                val title_1 = haveValues.optString("title")
+                val fieldsDataArray = fields.getJSONObject(getSortedTypeWithYPosition)
+                val type = fieldsDataArray.optString("type")
+                var value: String? =  fieldsDataArray.optString("value")
+                val title = fieldsDataArray.optString("title")
 
-                if (haveValues.has("options")) {
-                    options = haveValues.getJSONArray("options")
+                if (fieldsDataArray.has("options")) {
+                    options = fieldsDataArray.getJSONArray("options")
                 }
                 mainHandler.post {
-                    if (shorteddatawithYPosition[j] == "block") {
+                    if (shortedDataWithYPosition[j] == "block") {
                         textField.text = value.toString()
                         componentLayout.addView(textField)
                     }
 
-                    if (shorteddatawithYPosition[j] == "multiSelect") {
+                    if (shortedDataWithYPosition[j] == "multiSelect") {
                         componentLayout.addView(multipleChoice)
                     }
 
-                    if (shorteddatawithYPosition[j] == "text") {
+                    if (shortedDataWithYPosition[j] == "text") {
                         val shortField = ShortField(context)
-                        shortField.updateTextFieldTitle(title_1.toString(), value.toString())
+                        shortField.updateTextFieldTitle(title.toString(), value.toString())
                         componentLayout.addView(shortField)
                     }
 
-                    if (shorteddatawithYPosition[j] == "dropdown") {
+                    if (shortedDataWithYPosition[j] == "dropdown") {
                         componentLayout.addView(dropDown)
                     }
 
-                    if (shorteddatawithYPosition[j] == "table") {
+                    if (shortedDataWithYPosition[j] == "table") {
                         val tableField = TableField(context)
-                        tableField.updateTableTitle(title_1.toString())
+                        tableField.updateTableTitle(title.toString())
                         componentLayout.addView(tableField)
                     }
 
-                    if (shorteddatawithYPosition[j] == "number" ) {
+                    if (shortedDataWithYPosition[j] == "number" ) {
                         val numberField = NumberField(context)
                         var numberValue: Int = 0
 
-                        if (haveValues.has("value")){
-                            numberValue = haveValues.optInt("value", 0)
+                        if (fieldsDataArray.has("value")){
+                            numberValue = fieldsDataArray.optInt("value", 0)
                         }
-                        numberField.updateNumberFieldValue(title_1.toString(), numberValue)
+                        numberField.updateNumberFieldValue(title.toString(), numberValue)
                         componentLayout.addView(numberField)
                     }
 
-                    if (shorteddatawithYPosition[j] == "textarea") {
+                    if (shortedDataWithYPosition[j] == "textarea") {
                         val longTextField = LongTextField(context)
-                        longTextField.updateTextFieldTitle(title_1.toString(), value.toString())
+                        longTextField.updateTextFieldTitle(title.toString(), value.toString())
                         componentLayout.addView(longTextField)
                     }
                 }
@@ -356,7 +354,7 @@ class MobileSDKField(context: Context) : LinearLayout(context){
     }
 
     // Mark: Regex for get Sorted Value
-    fun valueForSortedType(input: String): List<String> {
+    fun fetchSortedComponentType(input: String): List<String> {
         val regex = Regex("\\(\\d+,\\s*(\\w+)\\)")
         val matches = regex.findAll(input)
         return matches.map { it.groupValues[1] }.toList()
@@ -371,31 +369,30 @@ class MobileSDKField(context: Context) : LinearLayout(context){
     }
 
     private fun setTextAlign(textAlign: String, textField: TextField) {
-        if (textAlign.equals("center")){
+        if (textAlign.equals("center")) {
             textField.textAlignment = TEXT_ALIGNMENT_CENTER
-        }else if (textAlign.equals("right")){
+        } else if (textAlign.equals("right")) {
             textField.textAlignment = TEXT_ALIGNMENT_TEXT_END
-        }else{
+        } else {
             textField.textAlignment = TEXT_ALIGNMENT_TEXT_START
         }
     }
 
     private fun setFontWeight(fontWeight: String, textField: TextField) {
-        if(fontWeight.equals("bold")){
+        if(fontWeight.equals("bold")) {
             textField.setBold(true)
-        }else{
+        } else {
             textField.setBold(false)
         }
     }
 
     private fun setFontStyle(fontStyle: String, textField: TextField) {
-        if(fontStyle.equals("italic")){
+        if(fontStyle.equals("italic")) {
             textField.setItalic(true)
-        }else{
+        } else {
             textField.setItalic(false)
         }
     }
 }
-
 //Mark: Model class
-data class MyDataList(val id: String, val deleted: Boolean, val cells: List<String>)
+data class RowsModel(val id: String, val deleted: Boolean, val cells: List<String>)

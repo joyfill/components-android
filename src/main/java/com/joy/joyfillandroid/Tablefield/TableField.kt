@@ -19,6 +19,7 @@ import com.joy.joyfillandroid.OnDrawHelper
 import com.joy.joyfillandroid.R
 import com.joy.joyfillandroid.RecyclerItemClickListenr
 import com.joy.joyfillandroid.RecyclerModel
+import com.joy.joyfillandroid.customTypeFace
 import com.joy.joyfillandroid.dpToPx
 import com.joy.joyfillandroid.getScreenWidth
 import org.json.JSONArray
@@ -35,16 +36,17 @@ class TableField(context: Context): LinearLayout(context){
     private lateinit var bottomSheetDialog: BottomSheetDialog
     private lateinit var adapter: DropDownAdapter
     var list= ArrayList<RecyclerModel>()
-    private var testString: String? = null
-    var dataArray = TableFieldObj.RowArray
+
+    var rowArrayList = variable.rowArray
+
     var rowIndex: Int? = 0
     var columnIndex: Int? = 0
-    object TableFieldObj {
-        var RowArray = mutableListOf<MyDataList>()
+    object variable {
+        var rowArray = mutableListOf<RowsModel>()
     }
     init {
-        addDummyRow()
-        val columnArray = Table.ShareText.getRowTitle
+        insertEmptyCellsData()
+        val columnTitleArray = Table.globalVariable.getColumnTitle
         orientation = VERTICAL
         setPadding(25,15,25,15)
 
@@ -149,31 +151,30 @@ class TableField(context: Context): LinearLayout(context){
             TableLayout.LayoutParams.MATCH_PARENT
         )
 
-        val headRow = TableRow(context)
-        headRow.layoutParams = TableRow.LayoutParams(
+        val headerRow = TableRow(context)
+        headerRow.layoutParams = TableRow.LayoutParams(
             TableRow.LayoutParams.MATCH_PARENT,
             TableRow.LayoutParams.WRAP_CONTENT
         )
-        headRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
-        setTopRowBackground(headRow)
-        createDynamicColumns(tableLayout, columnArray, headRow, Table.ShareText.getRowType)
+        headerRow.setBackgroundColor(Color.parseColor("#F3F4F8"))
+        setTopRowBackground(headerRow)
+
+        tableViewHeader(tableLayout, columnTitleArray, headerRow, Table.globalVariable.getColumnType)
 
         for (index in 0 until 3) {
-            val dataRow = TableFieldObj.RowArray[index]
             addNewIndex = index + 1
-            val newIndex = index + 1
             val tableRow = TableRow(context)
             tableRow.layoutParams = TableRow.LayoutParams(
                 TableRow.LayoutParams.MATCH_PARENT,
                 TableRow.LayoutParams.WRAP_CONTENT
             )
             if (index == 2 ) {
-                tableRow.background = createRoundedBackgroundForLastRow(30f)
+                tableRow.background = cornerRadiusForLastRow(30f)
             } else {
-                tableRow.background = getRowBackground()
+                tableRow.background = setRowBackground()
             }
 
-            addTextDropDownColumn(index, tableRow, tableLayout)
+            insertCellsValues(index, tableRow, tableLayout)
             tableLayout.addView(tableRow)
         }
 
@@ -183,41 +184,42 @@ class TableField(context: Context): LinearLayout(context){
     }
 
     //Mark:- Function for Add Dummy Row
-    private fun addDummyRow() {
-        if (TableFieldObj.RowArray.size == 1){
+    private fun insertEmptyCellsData() {
+        if (variable.rowArray.size == 1){
             val numCells = findNumberOfColumns()
             val emptyRowCells = List(numCells) { "" }
-            val dummyRow1 = MyDataList(id = "newRowId", deleted = false, cells = emptyRowCells)
-            val dummyRow2 = MyDataList(id = "newRowId", deleted = false, cells = emptyRowCells)
-            TableFieldObj.RowArray.add(dummyRow1)
-            TableFieldObj.RowArray.add(dummyRow2)
+            val dummyRow1 = RowsModel(id = "newRowId", deleted = false, cells = emptyRowCells)
+            val dummyRow2 = RowsModel(id = "newRowId", deleted = false, cells = emptyRowCells)
+            variable.rowArray.add(dummyRow1)
+            variable.rowArray.add(dummyRow2)
 
-        }else if(TableFieldObj.RowArray.size == 2){
+        } else if(variable.rowArray.size == 2){
             val numCells = findNumberOfColumns()
             val emptyRowCells = List(numCells) { "" }
-            val dummyRow1 = MyDataList(id = "newRowId", deleted = false, cells = emptyRowCells)
-            TableFieldObj.RowArray.add(dummyRow1)
+            val dummyRow1 = RowsModel(id = "newRowId", deleted = false, cells = emptyRowCells)
+            variable.rowArray.add(dummyRow1)
         }
     }
 
     //Mark:- Function for update row count
     override fun isFocused(): Boolean {
         val idsToRemove = setOf("newRowId")
-        dataArray.removeIf { it.id in idsToRemove }
-        rowCountTextView.text = "+" + Table.ShareText.dataObjects.size
+        rowArrayList.removeIf { it.id in idsToRemove }
+        rowCountTextView.text = "+" + variable.rowArray.size
         return super.isFocused()
     }
 
     //Mark:- Function for create dynamic header row and set columns title
-    fun createDynamicColumns(tableLayout: TableLayout, columnArray: MutableList<String>, headerRow: TableRow, columnType: MutableList<String>) {
-        val numColumns = columnArray.size
-        val context = tableLayout.context
+    fun tableViewHeader(tableLayout: TableLayout, columnTitleArray: MutableList<String>, headerRow: TableRow, columnType: MutableList<String>) {
+        val numColumns = columnTitleArray.size
 
-        for ((index, columnName) in columnArray.withIndex()) {
+
+        for ((index, columnName) in columnTitleArray.withIndex()) {
             val textView = TextView(context)
             textView.setPadding(dpToPx(context,5), dpToPx(context,5), dpToPx(context,5),dpToPx(context,5))
             textView.setTextColor(Color.parseColor(textColor))
             val availableWidth = getScreenWidth(context) - 100
+
             val layoutParams = TableRow.LayoutParams(
                 if (numColumns == 1) {
                     availableWidth
@@ -230,13 +232,14 @@ class TableField(context: Context): LinearLayout(context){
             )
 
             if (index == 0) {
-                textView.background = topLeftCellBackground()
-            }else if (index == numColumns - 1) {
-                textView.background = topRightCellBackground()
-            }else{
+                textView.background = setTableTopLeftCornerRadius()
+            } else if (index == numColumns - 1) {
+                textView.background = setTableTopRightCornerRadius()
+            } else{
                 setTopRowBackground(headerRow)
-                textView.background = getCellBackground()
+                textView.background = setCellBackgroundColor()
             }
+
             textView.layoutParams = layoutParams
             textView.gravity = Gravity.CENTER
             textView.text = columnName
@@ -247,16 +250,16 @@ class TableField(context: Context): LinearLayout(context){
     }
 
     //Mark:- Function for create dynamic rows and update cells values
-     fun addTextDropDownColumn(index: Int, tableRow: TableRow, tableLayout: TableLayout) {
-        for (i in Table.ShareText.getRowType.indices) {
-            val type = Table.ShareText.getRowType[i]
+     fun insertCellsValues(index: Int, tableRow: TableRow, tableLayout: TableLayout) {
+        for (i in Table.globalVariable.getColumnType.indices) {
+            val type = Table.globalVariable.getColumnType[i]
             val columnOrderIndex = i
             val rowOrderIndex = index
-            val columnId = Table.ShareText.tableColumnOrderArrayID[columnOrderIndex]
+            val columnId = Table.globalVariable.tableColumnOrderArrayID[columnOrderIndex]
             when (type) {
                 "text" -> {
                     val textColumnLayout = LinearLayout(context)
-                    textColumnLayout.background = getCellBackground()
+                    textColumnLayout.background = setCellBackgroundColor()
                     textColumnLayout.gravity = Gravity.START
                     textColumnLayout.layoutParams = TableRow.LayoutParams(
                         TableRow.LayoutParams.MATCH_PARENT,
@@ -275,10 +278,11 @@ class TableField(context: Context): LinearLayout(context){
                     textColumnView.textSize = 12f
                     textColumnView.gravity = Gravity.START
                     textColumnView.setTextColor(Color.parseColor(textColor))
-                    if (index == 2  && columnOrderIndex == Table.ShareText.getRowType.size - 1) {
-                        textColumnLayout.background = lastRowRightBottom()
-                    }else if (index == 2 && columnOrderIndex == 0){
-                        textColumnLayout.background = firstCellLastRow()
+
+                    if (index == 2  && columnOrderIndex == Table.globalVariable.getColumnType.size - 1) {
+                        textColumnLayout.background = lastRowRightBottomCornerRadius()
+                    } else if (index == 2 && columnOrderIndex == 0){
+                        textColumnLayout.background = lastRowLeftBottomCornerRadius()
                     }
 
                     textColumnView.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -289,8 +293,8 @@ class TableField(context: Context): LinearLayout(context){
                         }
                     }
 
-                    val cellValues = TableFieldObj.RowArray[rowOrderIndex].cells
-                    val value =cellValues[columnOrderIndex]
+                    val cellValues = variable.rowArray[rowOrderIndex].cells
+                    val value = cellValues[columnOrderIndex]
                     textColumnView.setText(""+value)
                     textColumnLayout.addView(textColumnView)
                     tableRow.addView(textColumnLayout)
@@ -299,7 +303,7 @@ class TableField(context: Context): LinearLayout(context){
                     var options: JSONArray? = null
                     val dropDownColumnLayout = LinearLayout(context)
                     val dropDownText = TextView(context)
-                    dropDownColumnLayout.background = getCellBackground()
+                    dropDownColumnLayout.background = setCellBackgroundColor()
                     dropDownColumnLayout.gravity = Gravity.CENTER_HORIZONTAL
                     dropDownColumnLayout.layoutParams = TableRow.LayoutParams(
                         TableRow.LayoutParams.MATCH_PARENT,
@@ -314,10 +318,10 @@ class TableField(context: Context): LinearLayout(context){
                     dropDownText.layoutParams = dropDownTextLayoutParams
                     dropDownTextLayoutParams.setMargins(0, dpToPx(context, 10), 0, 0)
                     dropDownText.setTextColor(Color.parseColor(textColor))
-                    val cellValues = TableFieldObj.RowArray[rowOrderIndex].cells
+                    val cellValues = variable.rowArray[rowOrderIndex].cells
 
-                    for (i in 0 until Table.ShareText.tableColumns_Array.length()) {
-                        val option = Table.ShareText.tableColumns_Array.getJSONObject(i)
+                    for (i in 0 until Table.globalVariable.tableColumnsArray.length()) {
+                        val option = Table.globalVariable.tableColumnsArray.getJSONObject(i)
                         if (option.getString("_id") == columnId) {
                             options = option.getJSONArray("options")
                         }
@@ -341,19 +345,20 @@ class TableField(context: Context): LinearLayout(context){
                     downArrowLayoutParams.setMargins(0, dpToPx(context, 10), 0, 0)
                     downArrow.setImageResource(R.drawable.ic_expand_down)
                     downArrow.setPadding(dpToPx(context, 5), 0, 0, 0)
-                    if (index == 2 && columnOrderIndex == Table.ShareText.getRowType.size - 1) {
-                        dropDownColumnLayout.background = lastRowRightBottom()
-                    }else if (index == 2 && columnOrderIndex == 0){
-                        dropDownColumnLayout.background = firstCellLastRow()
+
+                    if (index == 2 && columnOrderIndex == Table.globalVariable.getColumnType.size - 1) {
+                        dropDownColumnLayout.background = lastRowRightBottomCornerRadius()
+                    } else if (index == 2 && columnOrderIndex == 0){
+                        dropDownColumnLayout.background = lastRowLeftBottomCornerRadius()
                     }
 
                     dropDownColumnLayout.setOnClickListener {
                         var indexValue: Pair<Int, Int>? = null
-                        indexValue = getColumnIndex(tableLayout, dropDownColumnLayout)
+                        indexValue = findColumnIndex(tableLayout, dropDownColumnLayout)
                         rowIndex = indexValue?.first
                         columnIndex = indexValue?.second
                         if (rowIndex != null && columnIndex != null) {
-                            createRecyclerView(context, options, tableLayout)
+                            dropDownOptionsBottomSheet(context, options, tableLayout)
                         }
                     }
 
@@ -366,7 +371,7 @@ class TableField(context: Context): LinearLayout(context){
     }
 
     //Mark:- Function for finding row index and column index of the table
-    fun getColumnIndex(tableLayout: TableLayout, cell: View): Pair<Int, Int>? {
+    fun findColumnIndex(tableLayout: TableLayout, cell: View): Pair<Int, Int>? {
         val rowCount = tableLayout.childCount
         for (rowIndex in 0 until rowCount) {
             val row = tableLayout.getChildAt(rowIndex) as TableRow
@@ -382,7 +387,7 @@ class TableField(context: Context): LinearLayout(context){
     }
 
     //Mark: Function for showing Bottom Sheet with multiple options
-    fun createRecyclerView(context: Context, option: JSONArray?, tableLayout: TableLayout): LinearLayout {
+    fun dropDownOptionsBottomSheet(context: Context, option: JSONArray?, tableLayout: TableLayout): LinearLayout {
 
         val linearLayout = LinearLayout(context)
         linearLayout.orientation = LinearLayout.VERTICAL
@@ -424,9 +429,8 @@ class TableField(context: Context): LinearLayout(context){
             override fun onItemClick(view: View, position: Int) {
                 val newText = list.get(position).checkBox
                 adapter.notifyDataSetChanged()
-                testString = newText
-                Table.ShareText.text = newText
-                updateCellText(tableLayout, rowIndex!!, columnIndex!! )
+                Table.globalVariable.text = newText
+                updateDropDownCellText(tableLayout, rowIndex!!, columnIndex!! )
                 bottomSheetDialog.dismiss()
             }
         }))
@@ -437,14 +441,14 @@ class TableField(context: Context): LinearLayout(context){
         return linearLayout
     }
 
-    fun updateCellText(tableLayout: TableLayout, rowIndex: Int, columnIndex: Int) {
+    fun updateDropDownCellText(tableLayout: TableLayout, rowIndex: Int, columnIndex: Int) {
         val row = tableLayout.getChildAt(rowIndex) as TableRow
         if (columnIndex >= 0 && columnIndex < row.childCount) {
             val linearLayout = row.getChildAt(columnIndex) as LinearLayout
             if (linearLayout.childCount > 0) {
                 val cell = linearLayout.getChildAt(0) as TextView
                 if (cell != null){
-                    cell.text = Table.ShareText.text
+                    cell.text = Table.globalVariable.text
                 }
             }
         }
@@ -452,57 +456,46 @@ class TableField(context: Context): LinearLayout(context){
 
     //Mark: function for finds number of columns
     fun findNumberOfColumns(): Int {
-        if (dataArray.isNotEmpty()) {
-            val firstRow = dataArray.first()
+        if (rowArrayList.isNotEmpty()) {
+            val firstRow = rowArrayList.first()
             return firstRow.cells.size
         }
         return 0
     }
-    
     override fun onDraw(canvas: Canvas?) {
         OnDrawHelper.onDrawGlobal(context, this)
         super.onDraw(canvas)
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    fun customTypeFace(fontWeight: Int): Typeface{
-        val typeface = Typeface.create(null, fontWeight, false)
-        return typeface
-    }
-
     //Mark: Cell Background
-    fun getCellBackground(): GradientDrawable{
+    fun setCellBackgroundColor(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(2, Color.parseColor("#E6E7EA"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-
-    fun topRightCellBackground(): GradientDrawable{
+    fun setTableTopRightCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(0f, 0f, 30f, 30f, 0f, 0f, 0f, 0f)
         drawable.setStroke(3, Color.parseColor("#E6E7EA"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-
-    fun topLeftCellBackground(): GradientDrawable{
+    fun setTableTopLeftCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.cornerRadii = floatArrayOf(30f, 30f, 0f, 0f, 0f, 0f, 0f, 0f)
         drawable.setStroke(3, Color.parseColor("#E6E7EA"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-
     fun editTextBackground(color: String, strokewidth: Int): GradientDrawable{
         val editDrawable = GradientDrawable()
         editDrawable.shape = GradientDrawable.RECTANGLE
         editDrawable.setStroke(strokewidth,Color.parseColor(color))
         return editDrawable
     }
-
-    private fun setTopRowBackground(view: TableRow){
+    fun setTopRowBackground(view: TableRow){
         val drawable = GradientDrawable()
         drawable.setColor(Color.parseColor("#F3F4F8"))
         drawable.cornerRadii = floatArrayOf(
@@ -512,29 +505,25 @@ class TableField(context: Context): LinearLayout(context){
         drawable.setStroke(3,Color.parseColor("#E6E7EA"))
         view.background = drawable
     }
-
-    fun  lastRowRightBottom(): GradientDrawable{
+    fun  lastRowRightBottomCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(2,Color.parseColor("#E6E7EA"))
         drawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 30f, 30f, 0f, 0f)
         return drawable
     }
-
-    fun firstCellLastRow(): GradientDrawable{
+    fun lastRowLeftBottomCornerRadius(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(3, Color.parseColor("#E2E3E7"))
         drawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 30f, 30f)
         return drawable
     }
-
-    fun getRowBackground(): GradientDrawable{
+    fun setRowBackground(): GradientDrawable{
         val drawable = GradientDrawable()
         drawable.setStroke(2 , Color.parseColor("#E2E3E7"))
         drawable.shape = GradientDrawable.RECTANGLE
         return drawable
     }
-
-    fun createRoundedBackgroundForLastRow(radius: Float): GradientDrawable {
+    fun cornerRadiusForLastRow(radius: Float): GradientDrawable {
         val gradientDrawable = GradientDrawable()
         gradientDrawable.setStroke(3, Color.parseColor("#E2E3E7"))
         gradientDrawable.cornerRadii = floatArrayOf(0f, 0f, 0f, 0f, radius, radius, radius, radius)
@@ -544,6 +533,6 @@ class TableField(context: Context): LinearLayout(context){
     //Mark: Function update values at run time
     fun updateTableTitle(title: String){
         titleTextView.text = title
-        Table.ShareText.title = title
+        Table.globalVariable.title = title
     }
 }
